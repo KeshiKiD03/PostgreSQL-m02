@@ -1,0 +1,58 @@
+1- select last_name, hire_date
+from employees
+where department_id=
+  (select department_id
+  from employees
+  where last_name='&variable') and last_name <> 'VARIABLE'
+  
+2- select employee_id, last_name, salary
+from employees
+where salary >
+  (select avg(salary)
+  from employees)
+order by salary
+
+3- select employee_id, last_name
+from employees
+where job_id =
+  (select job_id
+  from employees
+  where last_name like '%U%')
+  
+4- SELECT LAST_NAME, DEPARTMENT_ID, JOB_ID
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID IN (SELECT DEPARTMENT_ID
+FROM DEPARTMENTS
+WHERE LOCATION_ID = '1700')
+
+SELECT LAST_NAME, DEPARTMENT_ID, JOB_ID
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID IN (SELECT DEPARTMENT_ID
+FROM DEPARTMENTS
+WHERE LOCATION_ID = '&location')
+
+5- SELECT LAST_NAME, SALARY
+FROM EMPLOYEES
+WHERE MANAGER_ID =(SELECT EMPLOYEE_ID
+FROM EMPLOYEES
+WHERE LAST_NAME 'King' AND FIRST_NAME= 'Steven')
+
+6- SELECT DEPARTMENT_ID, LAST_NAME, JOB_ID
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID IN(SELECT DEPARTMENT_iD
+FROM DEPARTMENTS
+WHERE DEPARTMENT_NAME='Executive')
+
+7- SELECT LAST_NAME, SALARY
+FROM EMPLOYEES
+WHERE SALARY > ANY (SELECT MAX(SALARY)
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID = '60')
+
+8- SELECT EMPLOYEE_ID, LAST_NAME, SALARY
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID IN(SELECT DISTINC DEPARTMENT_ID
+FROM EMPLOYEES
+WHERE LAST_NAME LIKE ('%u%')
+AND SALARY > (SELECT AVG(SALARY)
+FROM EMPLOYEES)

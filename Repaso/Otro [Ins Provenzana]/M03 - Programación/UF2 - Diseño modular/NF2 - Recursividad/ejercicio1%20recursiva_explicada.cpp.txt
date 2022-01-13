@@ -1,0 +1,36 @@
+/*Diseñar un algoritmo para calcular las poténcias de base entera y exponente natural de forma recursiva*/
+           
+#include <stdio.h>
+#include <conio.h>
+#include <ctype.h>
+#include <string.h>
+
+int potencia(int num,int i);
+
+main(){
+int num, pot;               
+printf("Dame un valor: ");
+scanf("%i",&num);
+printf("Dame una potencia: ");
+scanf("%i",&pot);
+                 
+
+printf("\nLa potencia es: %i\n",potencia(num,pot));
+getch();}
+
+int potencia(int num,int i)
+{
+
+int retorno=0;
+
+printf("Entrada a funcion potencia. num=%d, i=%d\n", num,i);
+if (i==0) 
+   {return (1);}
+else
+    {
+	printf("Antes llamada a funcion. ");
+	retorno=potencia(num,i-1)*num;
+	printf("Despues llamada a funcion. ");
+	return (retorno);
+	}
+}

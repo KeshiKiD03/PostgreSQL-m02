@@ -1,0 +1,41 @@
+Alt Camp                 Valls                    3          
+Alt Empordà              Figueres                 1          
+Alt Penedès              Vilafranca del Penedès   3          
+Alt Urgell               La Seu d'Urgell          7          
+Alta Ribagorça           El Pont de Suert         9          
+Anoia                    Igualada                 3          
+Bages                    Manresa                  3          
+Baix Camp                Reus                     2          
+Baix Ebre                Tortosa                  1          
+Baix Empordà             La Bisbal d'Empordà      1          
+Baix Llobregat           St. Feliu de Llobregat   1          
+Baix Penedès             El Vendrell              1          
+Barcelonès               Barcelona                1          
+Berguedà                 Berga                    8          
+Cerdanya                 Puigcerdà                13         
+Conca de Barberà         Montblanc                4          
+Garraf                   Vilanova i la Geltrú     1          
+Garrigues                Borges Blanques          4          
+Garrotxa                 Olot                     5          
+Gironès                  Girona                   1          
+Maresme                  Mataró                   1          
+Montsià                  Amposta                  1          
+Noguera                  Balaguer                 3          
+Osona                    Vic                      5          
+Pallars Jussà            Tremp                    5          
+Pallars Sobirà           Sort                     7          
+Pla d'Urgell             Mollerussa               3          
+Pla de l'Estany          Banyoles                 2          
+Priorat                  Falset                   4          
+Ribera d'Ebre            Mora d'Ebre              1          
+Ripollès                 Ripoll                   7          
+Segarra                  Cervera                  6          
+Segrià                   Lleida                   2          
+Selva                    Sta. Coloma de Farners   2          
+Solsonès                 Solsona                  7          
+Tarragonès               Tarragona                1          
+Terra Alta               Gandesa                  4          
+Urgell                   Tàrrega                  4          
+Val d'Aran               Viella                   10         
+Vallès Occidental        Sabadell                 2          
+Vallès Oriental          Granollers               2          

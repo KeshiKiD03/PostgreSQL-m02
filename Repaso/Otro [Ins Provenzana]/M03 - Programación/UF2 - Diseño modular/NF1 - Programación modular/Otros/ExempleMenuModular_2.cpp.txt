@@ -1,0 +1,77 @@
+//Ejemplo menu calculadora con while
+
+#include <stdio.h>
+#include <windows.h> //para poder usar el system("cls")
+#include <conio.h>
+
+//declaro las funciones
+void menu();
+void suma();
+
+
+main(){
+	//declaro variables
+	int opcio,num1,num2;
+	
+	//escribo el menu
+	menu();
+	scanf("%i",&opcio);
+	
+	//bucle que se repite hasta que pulse 3 sortir
+	while(opcio!=3){
+		//operaciones a realizar
+		switch(opcio){
+			case 1: suma();
+					break;
+			case 2: resta();
+					break;
+					
+		}
+		//escribo el menu
+		system("cls"); //borra pantalla, necesita la libreria <windows.h>
+		menu();
+		scanf("%i",&opcio);	
+	}
+}
+
+//desarrollo las funciones
+
+void menu(){
+	printf("CALCULADORA");
+	printf("\n1-Suma");
+	printf("\n2-Resta");
+	printf("\n3-Sortir");	
+	printf("\nTria una opcio: ");	
+}
+
+void suma(){
+	//declaro variables
+	int num1, num2;
+	
+	//pido valores
+	printf("\nSUMA");
+	printf("\nDime el primer numero: ");
+	scanf("%i",&num1);
+	printf("\nDime el segundo numero: ");
+	scanf("%i",&num2);
+	printf("\n%i + %i = %i",num1,num2,num1+num2);
+	getch();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,102 @@
+#include <conio.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_CHAR 20
+#define MAX_PLANTILLA 50
+
+typedef struct{
+    char calle[MAX_CHAR];
+    char num[MAX_CHAR];
+    char cp[MAX_CHAR];  
+}Direccion;
+
+typedef struct{
+    int dd;
+    int mm;
+    int aaaa;
+}Fecha;
+
+typedef struct{
+    int cod;
+    char nif[MAX_CHAR];
+    char nass[MAX_CHAR];
+    char nombre_completo[MAX_CHAR];
+    char nombre[MAX_CHAR];  // Aqui dentro van los campos
+    char apellidos[MAX_CHAR];    
+    Direccion dir;
+    char tf[MAX_CHAR];
+    char tf2[MAX_CHAR];
+    char email[MAX_CHAR];
+    Fecha f_nacimiento;
+    Fecha f_incorporacion;
+    char categoria[MAX_CHAR];
+    char estado_civil[MAX_CHAR];
+    int num_hijos;    
+    int minusvalido;      
+}Empleado;                     // El tipo se pone al final
+
+
+int busquedaLineal(Empleado vector[], int tamanio, int valor);
+void LeerEmpleado(Empleado *);
+void MostrarEmpleado(Empleado);
+
+int main(){
+    int valor,aux;
+    Empleado emp[2];
+    
+    for(int i=0;i<2;i++){
+    LeerEmpleado(&emp[i]);
+    MostrarEmpleado(emp[i]);
+    }
+    printf("**************\nintroduce el codigo a buscar:\n*************");
+    scanf("%i",&valor);
+    aux=busquedaLineal(emp,2,valor);
+    if(aux!=-1) printf("\nla posicion del vector es %i\n",aux+1);
+    else printf("\nno existe en el vector\n");
+    
+    system("PAUSE");
+    return 0;
+}
+
+void LeerEmpleado(Empleado *e){  // emp es una variable de tipo Empleado
+
+    char minusvalido;
+    printf("\nIntroduce el cod: ");
+    scanf("%i",&(*e).cod);
+    printf("\nIntroduce el NIF: ");
+    fflush(stdin);
+    gets((*e).nif);
+    printf("Introduce el numero de Seguridad Social: ");
+    gets((*e).nass);
+    printf("Introduce el nombre completo: ");
+    gets(e->nombre_completo);
+    fflush(stdin);
+    
+}
+
+
+void MostrarEmpleado(Empleado e){
+    sscanf(e.nombre_completo,"%s %s",e.nombre,e.apellidos);
+    printf("\n\n\nCODIGO: %i\n",e.cod); 
+    printf("NIF: %s\n",e.nif);    
+    printf("Numero de Seguridad Social: %s\n",e.nass);   
+    printf("Nombre: %s\n",e.nombre);
+  
+}
+
+
+int busquedaLineal(Empleado vector[], int tamanio, int valor){
+    int i=0;
+    int enc=0; // Indica si se ha encontrado el valor */
+    int pos=-1; // posición del valor buscado o -1 si no existe
+    while (enc==0 && i< tamanio){     
+    if(vector[i].cod==valor){
+    enc=1;
+    pos=i;
+    }
+    else i++;
+    }
+    return pos;
+    }

@@ -1,0 +1,6 @@
+Si es de group by y queremos poner condiciones va con HAVING y va debajo del group by. having GROUP CONDITION
+
+SELECT department_id, AVG(salary)
+FROM employees
+HAVING AVG(salary) > 8000
+GROUP BY department_id;

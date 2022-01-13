@@ -1,0 +1,96 @@
+import java.util.*;
+
+public class GestionaAlumno {
+	
+	public static void main (String args[]) {
+	
+	System.out.println("Gestiona alumno");	
+	
+	Alumno a1= new Alumno();
+
+	Alumno a2= new Alumno("Ramon", "Murillo", 36);		
+
+System.out.println(a1.nombre + " " + a1.apellido +", edad: " + a1.edad);
+System.out.println(a2.nombre + " " + a2.apellido +", edad: " + a2.edad);
+    
+   // a1.modificaDatos();
+    a1.getDatos();
+    a1.setDatos();
+	}
+}
+
+class Alumno{
+String nombre;
+String apellido;
+int edad;
+Alumno()
+	{
+	nombre="Sin nombre";
+	apellido="Sin apellido";
+	edad=0;	
+	}
+Alumno(String n, String a, int e)
+    {
+	nombre= n;
+	apellido = a;
+	edad = e;			
+    }
+protected void getDatos()
+    {
+	Scanner entrada= new Scanner(System.in);
+	System.out.println("Intro datos alumno:");	
+	System.out.println("nombre:");	
+	nombre= entrada.nextLine();
+    System.out.println("apellidos:");	
+	apellido= entrada.nextLine();
+    System.out.println("edad:");	
+	edad= entrada.nextInt();	
+    }
+
+public void setDatos()
+    {
+	System.out.println("Muestra datos alumno:");	
+	System.out.println(nombre+ " "+ apellido+", edad "+ edad);		
+//	System.out.println(this.nombre+ " "+ this.apellido+", edad "+ this.edad);		
+    }
+
+
+public void modificaDatos()
+    {
+	int opcion;
+	String nombre;
+	System.out.println("*****Menu*****");
+	System.out.println("1-Cambiar nombre");
+	System.out.println("2-Cambiar Apellido");
+	System.out.println("3-Cambiar edad");
+	System.out.println("Introduce la opcion: ");
+	Scanner cin=new Scanner (System.in); 
+	
+	opcion=cin.nextInt();
+	cin.nextLine();
+	switch(opcion)
+	{
+		case 1: System.out.println("Nombre: ");
+				nombre=cin.nextLine();
+		
+				break;
+		
+		case 2: System.out.println("Apellido: ");
+				apellido=cin.nextLine();
+				break;
+		
+		case 3:System.out.println("Edad: ");
+				edad=cin.nextInt();
+		
+				break;
+		
+		
+		
+		default:System.out.println("Opción incorrecta.");
+	};
+
+    }
+
+
+
+}

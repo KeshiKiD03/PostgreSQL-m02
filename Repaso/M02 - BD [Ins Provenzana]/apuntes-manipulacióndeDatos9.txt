@@ -1,0 +1,21 @@
+Transacción --> Recopilación de operaciones DML
+
+INSERT INTO tabla
+VALUES	value
+ 
+'[]' --> Opcional
+Fechas/Cadenas caracteres = ' '
+
+
+SELECT SYSDATE
+FROM DUAL --> TABLA TEMPORAL 
+
+Numero --> No comilla simple
+Cadena caracteres --> Comillas
+
+DESC --> DESCRIBIR TABLA / MOSTRAR
+
+SALARY 	NUMBER(9,2)
+7 ENTEROS Y 2 DECIMALES
+
+COMMIT; --> DATOS PERMANENTES

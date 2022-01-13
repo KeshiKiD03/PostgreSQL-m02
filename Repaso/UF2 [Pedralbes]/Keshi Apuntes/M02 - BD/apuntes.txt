@@ -1,0 +1,18 @@
+desc countries; --> Describe
+
+SELECT *
+FROM USER_TABLES --> Muestra todas las tablas
+
+DROP TABLE --> BORRAR TABLA
+
+SELECT *
+FROM USER_CONSTRAINTS
+
+TRUNCATE --> BORRAR Y NO SE RECUPERA CON ROLLBACK 
+
+CREATE TABLE HOLA
+	AS
+		SELECT *
+		FROM EMPLOYEES; --> HERRAMIENTA POTENTE
+
+http://docs.oracle.com/cd/B28359_01/server.111/b28310/tables006.htm

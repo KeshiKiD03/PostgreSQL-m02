@@ -1,0 +1,237 @@
+
+/*
+
+   *************************************************************************
+   ***** PASOS DE UNA POSIBLE ESTRATEGIA PARA CODIFICAR ITERACIONES ********
+   *************************************************************************
+
+    En el caso más completo, una iteración tiene 4 bloques de código.
+    
+    La instrucción "for" contempla en la propia instrucción estos 4 bloques. 
+	Tres de ellos son los 3 parámetros de entrada de la instrucción "for", y el
+	cuarto, el código que hay entre {} después de los parámetros.
+	
+	PASO 1
+	------
+	
+	Codificar secuencialmente, sistema "garrulo", unas cuentas sentencias que hagan 
+	lo que pide el enunciado, para unos datos concretos de ejemplo. A medida que 
+	tengamos mas practica lo podemos hacer menos "garrulo".
+	En este caso el enunciado es:
+	
+		Introducir un número por pantalla y escribe en orden decreciente,
+		los 100 primeros números pares.
+		Por ejemplo: Número 50:  50 48 46 44  .... -148
+	
+	Cojamos el ejemplo del propio enunciado e imprimimos los primeros numeros:
+	
+		int num=0;
+	
+		num=50;
+		printf ("%d\n", num);
+		
+		num=48;
+		printf ("%d\n", num);
+		
+		num=46;
+		printf ("%d\n", num);
+		
+		num=44;
+		printf ("%d\n", num);
+	
+	Ejecutamos el programa con la opción Depurar de DevC, añadiendo las variables que hayamos
+	definido, a la ventana de visualización de la herramienta "Depurar". 
+	Visualizamos la ventana "negra" donde saldrán los printf, de manera que podamos ver también a la vez
+	la ventana de la aplicacion DevC.
+	
+	Con el depurador (o debbuger) ejecutamos linea a linea (F7) el codigo, y vamos observando como van cambiando 
+	los valores de las variables y como van apareciendo los printf en la ventana de la consola.
+	
+	El código de ejemplo que hemos escrito nos puede ayudar en la decision de que codigo colocar
+	en los 4 bloques de codigo de la instruccion for. 
+	
+	En el texto que sigue a continuacion, se explica que se debe codificar en cada uno de los 4 bloques. 
+	Tras la explicacion de cada bloque, hay un espacio para escribir el codigo que deberia ir en dicho bloque.
+
+	Recordatorio de la estructura de una instruccion "for":
+	
+	for (param1; param2; param3) {
+	
+	}
+	
+	BLOQUE 1: Primer parametro del "for"
+	-------------------------------------
+
+		Hemos de poner el trozo de codigo que determine:
+			Desde que valor empieza el bucle 
+                --> se ejecuta ANTES del bucle;
+
+
+    AQUI HEMOS DE ESCRIBIR EL CODIGO DEL BLOQUE 1:
+         en este ejemplo, escribimos la instruccion que nos asigna 
+         el numero del que hemos de partir:
+     
+	 INICIO CODIGO:
+  
+           		num=50;
+
+     FIN CODIGO:
+
+
+
+	BLOQUE 2: Segundo parametro del "for"
+	-------------------------------------
+
+
+		Hemos de poner el trozo de codigo que determine:
+			Mientras que se cumpla una pregunta ...
+			(la pregunta seria como lo que ponemos dentro un "if") 
+				... se ejecutara otra iteración del bucle (lo que pondremos entre {} del "for")
+               	--> esta pregunta se hace ANTES de cada iteración
+
+         En el ejemplo que hemos codificado, hemos llegado hasta el numero 44 
+         inclusive:
+
+	CODIGO:
+		num>=44
+	FIN CODIGO:
+
+
+
+	BLOQUE 3: Codigo entre {} de la instruccion "for" que es el que se ejecutara
+	----------------------------------------------------------------------------
+	          de manera "repetitiva"
+              ----------------------
+
+    	... es decir lo que hemos codificado con el sistema "garrulo", excepto los valores 
+    	de los numeros, ya que la variacion de estos valores ya esta prevista 
+		en el bloque 4 de la estructura iterativa
+
+/*   CODIGO:
+		printf ("%d\n", num);
+/*   FIN CODIGO:
+
+
+	BLOQUE 4: Codigo entre {} de la instruccion "for" que es el que se ejecutara
+	----------------------------------------------------------------------------
+	          de manera "repetitiva"
+              ----------------------
+
+    	... es decir lo que hemos codificado con el sistema "garrulo", excepto los valores 
+    	de los numeros, ya que la variacion de estos valores ya esta prevista 
+		en el bloque 4 de la estructura iterativa
+
+/*   CODIGO:
+		printf ("%d\n", num);
+/*   FIN CODIGO:
+
+
+
+
+
+
+
+
+
+
+
+
+//&&&&&&&&&&&&&& M'HE QUEDAT AQUI
+
+
+
+
+	BLOQUE 4: Tercer parametro del "for"
+	------------------------------------
+
+      Incremento/Decremento (de 1 en 1, de 2 en 2) de un valor que habitualmente
+      (no siempre) se utilizara en el bloque 2 para terminar el bucle
+               	--> se ejecuta al FINAL de cada iteración
+
+
+    	... es decir lo que hemos hecho implitamente en el codigo "garrulo", 
+        entre una instruccion repetitiva y la siguiente. Recordemos el codigo:
+              
+              
+                  num=50;
+                  printf ("%d\n", num);
+		
+                  num=48;
+                  printf ("%d\n", num);
+              
+                  num=46;
+                  printf ("%d\n", num);
+              
+                  num=44;
+                  printf ("%d\n", num);
+              
+         Lo que hemos hecho es restar 1 al campo num. Por lo tanto el codigo de la 
+         variacion deberia ser:
+
+         /*   CODIGO:
+         	num--;
+         /*   FIN CODIGO:
+
+
+	TRASLADO DE LOS 4 BLOQUES A LA INSTRUCCION "for":
+	-------------------------------------------------
+
+
+	for (num=50; num>=44; num--) {
+	
+        printf ("%d\n", num);
+	    
+	}
+
+	ADAPTACION DEL EJEMPLO "GARRULO" AL CODIGO SOLICITADO EN EL ENUNCIADO:
+	----------------------------------------------------------------------
+*/
+
+/*
+
+Introducir un número por pantalla y escribe en orden decreciente los 100 primeros números pares.
+Por ejemplo: Número 50:  50 48 46 44  .... -148
+
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+// VARIABLES GLOBALES (antes de todas las funciones)
+
+int num=0, numPed=0, contPares=0;
+
+int main(void)
+{
+
+
+    // Hemos de pedir el numero inicial por teclado y validar que sea par:
+
+       printf("Entra profa el numero inicial: ");
+
+       scanf("%d",&numPed);
+
+       if (numPed%2!=0){
+          printf("Error. El numero inicial no es par");
+       }
+
+
+	for (num=numPed; contPares<=100; num=num-2) {
+	
+        printf ("%d\n", num);
+        contPares++;
+	    
+	}
+
+    // con esta instruccion generamos una pausa para que no nos desaparezca la 
+    // ventana de la ejecucion. Para poder utilizarla hemos de añadir: 
+               #include <stdlib.h>  
+    // al inicio del programa
+
+       system("pause");
+
+ }
+ 
+ 
+
+   
+   

@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+
+int menu(void);
+int suma(int a, int b);
+int par(void);
+
+main(){
+	int opcion=0,res;
+	while(opcion!=5){
+      opcion=menu();
+      switch(opcion){
+      	case 0: 
+		  res=par();
+		  if (res==1){
+		    printf("\n Es un numero par");
+		  }
+		  else {
+		  	printf("\n Es un numero impar");
+		  }
+		  getch();
+		  break;
+      }
+	  			 		
+	}
+
+	
+	
+	
+}
+
+int menu (void){
+	int opcion;
+	 system("cls");
+	 printf("MENU");
+	 printf("\n0-Par");
+	 printf("\n1-Suma");
+	 printf("\n2-Resta");
+	 printf("\n3-Multiplicacion");
+	 printf("\n4-Division");
+	 printf("\n5-Salir");
+	 printf("\n\nElige una opci?n: ");
+	 scanf("%d",&opcion);
+	 
+	 return opcion;
+}
+
+int par(void){
+	 int num;
+	 system("cls");
+	 printf("PAR");
+	 printf("\nDime un numero:");
+	 scanf("%d",&num);
+	 if (num%2==0){
+	 	return 1;
+	 }
+	 else return 0;	
+}
+
+
+
+

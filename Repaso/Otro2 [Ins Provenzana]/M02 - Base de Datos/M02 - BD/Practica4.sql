@@ -1,0 +1,38 @@
+/* Practicas SQL 4 Academy */
+
+-- 1 --
+
+SELECT (LAST_NAME) "earns" (TO_CHAR(SALARY, '$99,999.00') "monthly but wants" (TO_CHAR(SALARY*3, '$99,999,00')
+FROM EMPLOYEES;
+
+-- 2 --
+
+SELECT LAST_NAME, HIRE_DATE, TO_CHAR(NEXT_DAY(ADD_MONTHS(HIRE_DATE,6), 'monday'), 'fm DAY, ddspth "of" Month, YYYY') AS REVIEW;
+
+-- 3 --
+
+SELECT LAST_NAME, HIRE_DATE, TO_CHAR(HIRE_DATE, 'DAY') AS DAY
+FROM EMPLOYEES
+ORDER BY DAY;
+
+SELECT TO_CHAR(TO_DATE('03/10/96','dd/mm/yy'), 'DAY') AS DAY
+FROM DUAL;
+
+-- 4 --
+
+SELECT LAST_NAME, COALESCE(TO_CHAR(COMMISSION_PCT), 'No Commission') AS COMM
+FROM EMPLOYEES;
+
+-- 5 --
+
+SELECT JOB_ID,
+	DECODE(JOB_ID, 'AD_PRES', 'A',
+		'ST_MAN', 'B',
+		'IT_PROG', 'C'
+		'SA_REP
+		
+		
+-- 6 --
+
+SELECT
+

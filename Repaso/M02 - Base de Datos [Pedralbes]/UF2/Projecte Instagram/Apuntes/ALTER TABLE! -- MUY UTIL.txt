@@ -1,0 +1,17 @@
+ALTER TABLE table_name
+ADD "column_name"	"datatype"
+
+ALTER TABLE table_name
+DROP COLUMN	"column_name"
+
+
+ALTER TABLE table_name
+MODIFY COLUMN	"column_name"
+
+ALTER TABLE table_name READ ONLY/READ WRITE;
+
+ALTER TABLE table_name
+RENAME COLUMN "column_name" TOP name; --> Cambiar nombre de la columna
+
+ALTER TABLE table_name
+RENAME TO "new_table_name"; --> Cambiar nombre de la table

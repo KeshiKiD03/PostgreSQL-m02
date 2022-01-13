@@ -1,0 +1,37 @@
+/*ejemplo switch*/
+#include <stdio.h>
+
+main(){
+	//declaro variable
+	int opcion,num1,num2;
+	
+	//escribo el menu
+	printf("********* MENU *********");
+	printf("\n  1)Suma ");
+	printf("\n  2)Resta ");
+	printf("\n  3)Salir ");
+	printf("\n\nElije una opcion: ");
+	
+	scanf("%i",&opcion);
+	
+	//ahora evaluo las diferentes opciones SWITCH
+	switch(opcion){
+		case 1: printf("\nSuma");
+				printf("\nDime un numero:");
+				scanf("%i",&num1);
+				printf("Dime otro numero:");
+				scanf("%i",&num2);
+				printf("La suma es: %i",num1+num2);
+				break;
+				
+		case 2: printf("\nResta");
+				break;
+				
+		case 3: printf("\nSalir");
+				break;
+				
+		default: printf("\nOpcion equivocada, estas muerto");
+				 break;
+	}
+}
+
