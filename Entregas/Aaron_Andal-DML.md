@@ -141,17 +141,17 @@ ERROR:  update or delete on table "rep_vendes" violates foreign key constraint "
 DETAIL:  Key (num_empl)=(1012) is still referenced from table "clients".
 training=> 
 
-* S'ha d'esborrar primer la comanda, després el client i després el venedor. Si no hi ha error d'integritat ja que no es pot deixar NULL. Segons \d.
+# * S'ha d'esborrar primer la comanda, després el client i després el venedor. Si no hi ha error d'integritat ja que no es pot deixar NULL. Segons \d.
 
-1. training=> DELETE FROM comandes WHERE clie = 1245;
+# 1. training=> DELETE FROM comandes WHERE clie = 1245;
 DELETE 1
 training=> 
 
-2. training=> DELETE FROM clients WHERE empresa = 'C1';
+# 2. training=> DELETE FROM clients WHERE empresa = 'C1';
 DELETE 1
 training=> 
 
-3. training=> DELETE FROM rep_vendes WHERE nom = 'Enric Jimenez';
+# 3. training=> DELETE FROM rep_vendes WHERE nom = 'Enric Jimenez';
 DELETE 1
 
    
@@ -289,7 +289,7 @@ DETAIL:  Key (num_clie)=(2103) is still referenced from table "comandes".
 
 # Dona error --> Solució
 
-1. Esborrar les comandes del 3 venedors.
+# 1. Esborrar les comandes del 3 venedors.
 
 training=> DELETE FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom LIKE '%Adams' OR nom LIKE '%Jones' OR nom LIKE '%Roberts');
 DELETE 9
@@ -299,7 +299,7 @@ training=> SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes 
 -------------+------+------+-----+-----------+----------+-----------+--------
 (0 rows)
 
-2. Ara si
+# 2. Ara si
 
 training=> DELETE FROM clients WHERE rep_clie IN (SELECT num_empl FROM rep_vendes WHERE nom LIKE '%Adams' OR nom LIKE '%Jones' OR nom LIKE '%Roberts');
 DELETE 7
@@ -341,7 +341,7 @@ training=> SELECT * FROM rep_vendes WHERE data_contracte < '1988-07-01' AND quot
 (0 rows)
 
 
-* No esborra cap
+# * No esborra cap
 
 training=> DELETE FROM rep_vendes WHERE data_contracte < '1988-07-01' AND quota IS NULL;
 DELETE 0
@@ -367,22 +367,22 @@ training=> SELECT * FROM comandes;
 
 training=> 
 
-* Sense CLAUSULA where esborra tot.
+# * Sense CLAUSULA where esborra tot.
 
 
 ## Exercici 12:
 
 Esborreu totes les comandes acceptades per la Sue Smith (cal tornar a disposar de la taula comandes)
 
-* EXIT
+# * EXIT
 
-* DROP DATABASE training;
+# * DROP DATABASE training;
 
-* CREATE DATABASE training;
+# * CREATE DATABASE training;
 
-* \c training
+# * \c training
 
-* training=> \i '/home/keshi/Documents/m02/trainingv4.sql'
+# * training=> \i '/home/keshi/Documents/m02/trainingv4.sql'
 ALTER TABLE
 ALTER TABLE
 DROP TABLE
@@ -442,7 +442,7 @@ Referenced by:
 training=> 
 
 
-1. Agafar num_empl en rep_vendes a Sue Smith
+# 1. Agafar num_empl en rep_vendes a Sue Smith
 ---
 training=> SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith';
  num_empl 
@@ -451,7 +451,7 @@ training=> SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith';
 (1 row)
 ---
 
-2. Filtrar les comandes de la Sue Smith.
+# 2. Filtrar les comandes de la Sue Smith.
 ---
 SELECT * FROM comandes WHERE rep = (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
  num_comanda |    data    | clie | rep | fabricant | producte | quantitat |  import  
@@ -464,14 +464,14 @@ SELECT * FROM comandes WHERE rep = (SELECT num_empl FROM rep_vendes WHERE nom = 
 
 ---
 
-3. Esborrem les comandes de la Sue Smith
+# 3. Esborrem les comandes de la Sue Smith
 ---
 training=> DELETE FROM comandes WHERE rep = (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
 DELETE 4
 training=>
 ---
 
-4. Verifiquem.
+# 4. Verifiquem.
 ---
 training=> SELECT * FROM comandes WHERE rep = (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
  num_comanda | data | clie | rep | fabricant | producte | quantitat | import 
@@ -485,14 +485,116 @@ training=> SELECT * FROM comandes WHERE rep = (SELECT num_empl FROM rep_vendes W
 
 Suprimeix els clients atesos per venedors les vendes dels quals són inferiors al 80% de la seva quota.
 
+# PROVES
+
+SELECT * FROM rep_vendes WHERE vendes < (quota*0.8);
+
+SELECT clients.num_clie, clients.empresa, clients.rep_clie, clients.limit_credit, rep_vendes.num_empl, rep_vendes.nom, rep_vendes.quota, rep_vendes.vendes FROM clients JOIN rep_vendes ON (clients.rep_clie = rep_vendes.num_empl) WHERE rep_vendes.vendes < (quota*0.8);
+
+# Mostra tot amb el JOIN, es clau que filtrar per a poder utilitzar multi taula.
+
+# Mostrem ara amb filtre.
+
+training=> SELECT clients.num_clie, clients.empresa, clients.rep_clie, clients.limit_credit, rep_vendes.num_empl, rep_vendes.nom, rep_vendes.quota, rep_vendes.vendes FROM clients JOIN rep_vendes ON (clients.rep_clie = rep_vendes.num_empl) WHERE rep_vendes.vendes < (quota*0.8);
+
+ num_clie |    empresa     | rep_clie | limit_credit | num_empl |      nom      |   quota   |  vendes   
+----------+----------------+----------+--------------+----------+---------------+-----------+-----------
+     2124 | Peter Brothers |      107 |     40000.00 |      107 | Nancy Angelli | 300000.00 | 186042.00
+     2113 | Ian & Schmidt  |      104 |     20000.00 |      104 | Bob Smith     | 200000.00 | 142594.00
+(2 rows)
+
+# RESPOSTA més simple
+
+DELETE FROM clients WHERE rep_clie IN (
+					SELECT num_empl 
+					FROM rep_vendes 
+					WHERE vendes < (quota));
+
+
+ERROR:  update or delete on table "clients" violates foreign key constraint "fk_comandes_clie" on table "comandes"
+DETAIL:  Key (num_clie)=(2124) is still referenced from table "comandes".
+training=> 
+
+# Dona error, s'han de borrar primer les comandes dels clients.
+
+1. SELECT * FROM COMANDES WHERE clie = 2124 OR clie = 2113;
+
+2. training=> DELETE FROM COMANDES WHERE clie = 2124 OR clie = 2113;
+DELETE 3
+training=> 
+
+
+# Ara si ens deixarà.
+
+3. training=> DELETE FROM clients WHERE rep_clie IN (
+                                        SELECT num_empl 
+                                        FROM rep_vendes 
+                                        WHERE vendes < (quota));
+DELETE 2
+training=> 
+
 
 ## Exercici 14:
 
 Suprimiu els venedors els quals el seu total de comandes actual (imports) és menor que el 2% de la seva quota.
 
+SELECT * FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) < (quota*0.2);
+
+# S'utilitza la funció de SUM per sumar el total IMPORT
+
+ num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
+----------+---------------+------+-------------+---------------------+----------------+-----+-----------+-----------
+      105 | Bill Adams    |   37 |          13 | Representant Vendes | 1988-02-12     | 104 | 350000.00 | 367911.00
+      109 | Mary Jones    |   31 |          11 | Representant Vendes | 1989-10-12     | 106 | 300000.00 | 392725.00
+      106 | Sam Clark     |   52 |          11 | VP Vendes           | 1988-06-14     |     | 275000.00 | 299912.00
+      101 | Dan Roberts   |   45 |          12 | Representant Vendes | 1986-10-20     | 104 | 300000.00 | 305673.00
+      108 | Larry Fitch   |   62 |          21 | Dir Vendes          | 1989-10-12     | 106 | 350000.00 | 361865.00
+      103 | Paul Cruz     |   29 |          12 | Representant Vendes | 1987-03-01     | 104 | 275000.00 | 286775.00
+      107 | Nancy Angelli |   49 |          22 | Representant Vendes | 1988-11-14     | 108 | 300000.00 | 186042.00
+(7 rows)
+
+DELETE FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) < (quota*0.2);
+
+training=> DELETE FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) < (quota*0.2);
+ERROR:  update or delete on table "rep_vendes" violates foreign key constraint "fk_clients_rep_clie" on table "clients"
+DETAIL:  Key (num_empl)=(105) is still referenced from table "clients".
+training=> 
+
+# Dona error
+
+# Solució, esborrar el num_empl 105 que fa referencia a la taula clients, error d'integritat per la CONSTRAINT "fk_clients_rep_clie".
+
+
 ## Exercici 15:
 
 Suprimiu els clients que no han realitzat comandes des del 10-11-1989.
+
+training=> SELECT clie from comandes
+                         GROUP BY clie
+                         HAVING MAX(data) <= '1989-11-10'
+;
+ clie 
+------
+ 2102
+(1 row)
+
+
+DELETE FROM clients
+WHERE num_clie NOT IN (SELECT clie from comandes
+                         GROUP BY clie
+                         HAVING MAX(data) <= '1989-11-10');
+                         
+                         
+                         
+training=> DELETE FROM clients
+WHERE num_clie NOT IN (SELECT clie from comandes
+                         GROUP BY clie
+                         HAVING MAX(data) <= '1989-11-10');
+ERROR:  update or delete on table "clients" violates foreign key constraint "fk_comandes_clie" on table "comandes"
+DETAIL:  Key (num_clie)=(2111) is still referenced from table "comandes".
+training=> 
+
+
 
 ## Exercici 16:
 
