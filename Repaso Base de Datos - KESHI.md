@@ -29,6 +29,10 @@ https://gitlab.com/jandugar/m02-bd
 
 \du --> Ver tu usuario
 
+https://www.freecodecamp.org/news/learn-sql-in-10-minutes/
+
+https://learnsql.com/blog/sql-basics-cheat-sheet/sql-basics-cheat-sheet-a4.pdf
+
 --------------------------------------------------
 
 Programación del CURSO UF3						Horas
