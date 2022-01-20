@@ -495,6 +495,8 @@ SELECT clients.num_clie, clients.empresa, clients.rep_clie, clients.limit_credit
 
 # Mostrem ara amb filtre.
 
+
+
 training=> SELECT clients.num_clie, clients.empresa, clients.rep_clie, clients.limit_credit, rep_vendes.num_empl, rep_vendes.nom, rep_vendes.quota, rep_vendes.vendes FROM clients JOIN rep_vendes ON (clients.rep_clie = rep_vendes.num_empl) WHERE rep_vendes.vendes < (quota*0.8);
 
  num_clie |    empresa     | rep_clie | limit_credit | num_empl |      nom      |   quota   |  vendes   
@@ -504,6 +506,8 @@ training=> SELECT clients.num_clie, clients.empresa, clients.rep_clie, clients.l
 (2 rows)
 
 # RESPOSTA més simple
+
+
 
 DELETE FROM clients WHERE rep_clie IN (
 					SELECT num_empl 
@@ -517,32 +521,45 @@ training=>
 
 # Dona error, s'han de borrar primer les comandes dels clients.
 
+``` 
+
 1. SELECT * FROM COMANDES WHERE clie = 2124 OR clie = 2113;
+
+``` 
+
+``` 
 
 2. training=> DELETE FROM COMANDES WHERE clie = 2124 OR clie = 2113;
 DELETE 3
 training=> 
 
+``` 
 
 # Ara si ens deixarà.
-
+```
 3. training=> DELETE FROM clients WHERE rep_clie IN (
                                         SELECT num_empl 
                                         FROM rep_vendes 
-                                        WHERE vendes < (quota));
+```                                        WHERE vendes < (quota));
 DELETE 2
 training=> 
-
+```
 
 ## Exercici 14:
 
 Suprimiu els venedors els quals el seu total de comandes actual (imports) és menor que el 2% de la seva quota.
 
-SELECT * FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) < (quota*0.2);
+```
+
+SELECT * FROM rep_vendes 
+	WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) 
+		< (quota*0.2);
+
+```
 
 # S'utilitza la funció de SUM per sumar el total IMPORT
 
- num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
+ num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes
 ----------+---------------+------+-------------+---------------------+----------------+-----+-----------+-----------
       105 | Bill Adams    |   37 |          13 | Representant Vendes | 1988-02-12     | 104 | 350000.00 | 367911.00
       109 | Mary Jones    |   31 |          11 | Representant Vendes | 1989-10-12     | 106 | 300000.00 | 392725.00
@@ -553,12 +570,21 @@ SELECT * FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num
       107 | Nancy Angelli |   49 |          22 | Representant Vendes | 1988-11-14     | 108 | 300000.00 | 186042.00
 (7 rows)
 
+
+```
+
 DELETE FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) < (quota*0.2);
 
+```
+
+```
+```
 training=> DELETE FROM rep_vendes WHERE (SELECT SUM(import) FROM comandes WHERE rep = num_empl) < (quota*0.2);
 ERROR:  update or delete on table "rep_vendes" violates foreign key constraint "fk_clients_rep_clie" on table "clients"
 DETAIL:  Key (num_empl)=(105) is still referenced from table "clients".
 training=> 
+
+```
 
 # Dona error
 
@@ -569,6 +595,7 @@ training=>
 
 Suprimiu els clients que no han realitzat comandes des del 10-11-1989.
 
+``` 
 training=> SELECT clie from comandes
                          GROUP BY clie
                          HAVING MAX(data) <= '1989-11-10'
@@ -578,14 +605,16 @@ training=> SELECT clie from comandes
  2102
 (1 row)
 
-
+```
+ 
+```
 DELETE FROM clients
 WHERE num_clie NOT IN (SELECT clie from comandes
                          GROUP BY clie
                          HAVING MAX(data) <= '1989-11-10');
+```                      
                          
-                         
-                         
+```                         
 training=> DELETE FROM clients
 WHERE num_clie NOT IN (SELECT clie from comandes
                          GROUP BY clie
@@ -593,32 +622,115 @@ WHERE num_clie NOT IN (SELECT clie from comandes
 ERROR:  update or delete on table "clients" violates foreign key constraint "fk_comandes_clie" on table "comandes"
 DETAIL:  Key (num_clie)=(2111) is still referenced from table "comandes".
 training=> 
-
+```
 
 
 ## Exercici 16:
 
 Eleva el límit de crèdit de l'empresa Acme Manufacturing a 60000 i la reassignes a Mary Jones.
 
+```
+training=> UPDATE clients 
+        SET rep_clie = (SELECT num_empl FROM rep_vendes WHERE nom = 'Mary Jones'), limit_credit = 60000
+WHERE empresa = 'Acme Mfg.'
+;
+UPDATE 1
+```
+
+training=> SELECT * FROM CLIENTS WHERE empresa = 'Acme Mfg.';
+ num_clie |  empresa  | rep_clie | limit_credit 
+----------+-----------+----------+--------------
+     2103 | Acme Mfg. |      109 |     60000.00
+(1 row)
+
+
+
 ## Exercici 17:
 
 Transferiu tots els venedors de l'oficina de Chicago (12) a la de Nova York (11), i rebaixa les seves quotes un 10%.
+
+```
+
+SELECT * FROM rep_vendes WHERE oficina_rep = 12;
+
+```
+
+```
+
+SELECT quota*0.1 "quota_10%" FROM rep_vendes WHERE oficina_rep = 12;
+
+```
+
+```
+
+UPDATE rep_vendes SET oficina_rep = 11, quota = (quota*0.1) WHERE oficina_rep = 12;
+
+```
+
+
+```
+
+training=> UPDATE rep_vendes SET oficina_rep = 11, quota = (quota*0.1) WHERE oficina_rep = 12;
+UPDATE 3
+training=> 
+
+
+```
+
+```
+
+SELECT * FROM rep_vendes WHERE oficina_rep = 11;
+
+
+ num_empl |     nom     | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
+----------+-------------+------+-------------+---------------------+----------------+-----+-----------+-----------
+      109 | Mary Jones  |   31 |          11 | Representant Vendes | 1989-10-12     | 106 | 300000.00 | 392725.00
+      106 | Sam Clark   |   52 |          11 | VP Vendes           | 1988-06-14     |     | 275000.00 | 299912.00
+      104 | Bob Smith   |   33 |          11 | Dir Vendes          | 1987-05-19     | 106 |  20000.00 | 142594.00
+      101 | Dan Roberts |   45 |          11 | Representant Vendes | 1986-10-20     | 104 |  30000.00 | 305673.00
+      103 | Paul Cruz   |   29 |          11 | Representant Vendes | 1987-03-01     | 104 |  27500.00 | 286775.00
+(5 rows)
+
+```
+
 
 ## Exercici 18:
 
 Reassigna tots els clients atesos pels empleats 105, 106, 107, a l'empleat 102.
 
+training=> SELECT * FROM CLIENTS WHERE rep_clie IN (105, 106, 107); 
+ num_clie |     empresa     | rep_clie | limit_credit 
+----------+-----------------+----------+--------------
+     2101 | Jones Mfg.      |      106 |     65000.00
+     2117 | J.P. Sinclair   |      106 |     35000.00
+     2122 | Three-Way Lines |      105 |     30000.00
+(3 rows)
+
+```
+training=> UPDATE CLIENTS SET rep_clie = 102 WHERE rep_clie IN (105, 106, 107);
+UPDATE 3
+training=> 
+```
+
+SELECT * FROM CLIENTS
+
 ## Exercici 19:
 
 Assigna una quota de 100000 a tots aquells venedors que actualment no tenen quota.
+
+
 
 ## Exercici 20:
 
 Eleva totes les quotes un 5%.
 
+
+
 ## Exercici 21:
 
 Eleva en 5000 el límit de crèdit de qualsevol client que ha fet una comanda d'import superior a 25000.
+
+
 
 ## Exercici 22:
 
@@ -642,7 +754,7 @@ Establiu un nou objectiu per aquelles oficines en que l'objectiu actual sigui in
 
 ## Exercici 27:
 
-Modifiqueu la quota dels caps d'oficina que tinguin una quota superior a la quota d'algun empleat de la seva oficina. Aquests caps han de tenir la mateixa quota que l'empleat de la seva oficina que tingui una quota menor.
+Modifiqueu la quota dels caps d'oficina que tinguin una quota superior a la quota d'algun empleat de la seva oficina. Aquests caps han de tenir la mateixa quota que l'empleat de la seva oficina que tingui la quota més petita.
 
 ## Exercici 28:
 
