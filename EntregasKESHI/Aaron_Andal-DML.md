@@ -651,31 +651,41 @@ Transferiu tots els venedors de l'oficina de Chicago (12) a la de Nova York (11)
 
 ```
 
-SELECT * FROM rep_vendes WHERE oficina_rep = 12;
+training=> SELECT quota FROM rep_vendes WHERE oficina_rep = 12;
+quota 
+-----------
+ 200000.00
+ 300000.00
+ 275000.00
+(3 rows)
+
+
+```
+
+```
+
+SELECT quota-(quota*0.1) "quota_10%" FROM rep_vendes WHERE oficina_rep = 12;
+
+training=> 
+ quota_10%  
+------------
+ 180000.000
+ 270000.000
+ 247500.000
+(3 rows)
+
 
 ```
 
 ```
 
-SELECT quota*0.1 "quota_10%" FROM rep_vendes WHERE oficina_rep = 12;
-
-```
-
-```
-
-UPDATE rep_vendes SET oficina_rep = 11, quota = (quota*0.1) WHERE oficina_rep = 12;
-
-```
-
-
-```
-
-training=> UPDATE rep_vendes SET oficina_rep = 11, quota = (quota*0.1) WHERE oficina_rep = 12;
+training=> UPDATE rep_vendes SET oficina_rep = 11, quota = (quota-(quota*0.1)) WHERE oficina_rep = 12;
 UPDATE 3
 training=> 
 
 
 ```
+
 
 ```
 
@@ -686,10 +696,13 @@ SELECT * FROM rep_vendes WHERE oficina_rep = 11;
 ----------+-------------+------+-------------+---------------------+----------------+-----+-----------+-----------
       109 | Mary Jones  |   31 |          11 | Representant Vendes | 1989-10-12     | 106 | 300000.00 | 392725.00
       106 | Sam Clark   |   52 |          11 | VP Vendes           | 1988-06-14     |     | 275000.00 | 299912.00
-      104 | Bob Smith   |   33 |          11 | Dir Vendes          | 1987-05-19     | 106 |  20000.00 | 142594.00
-      101 | Dan Roberts |   45 |          11 | Representant Vendes | 1986-10-20     | 104 |  30000.00 | 305673.00
-      103 | Paul Cruz   |   29 |          11 | Representant Vendes | 1987-03-01     | 104 |  27500.00 | 286775.00
+      104 | Bob Smith   |   33 |          11 | Dir Vendes          | 1987-05-19     | 106 | 180000.00 | 142594.00
+      101 | Dan Roberts |   45 |          11 | Representant Vendes | 1986-10-20     | 104 | 270000.00 | 305673.00
+      103 | Paul Cruz   |   29 |          11 | Representant Vendes | 1987-03-01     | 104 | 247500.00 | 286775.00
 (5 rows)
+
+~
+
 
 ```
 
@@ -712,45 +725,264 @@ UPDATE 3
 training=> 
 ```
 
-SELECT * FROM CLIENTS
+SELECT * FROM CLIENTS;
+
+```
+training=> SELECT * FROM CLIENTS;
+ num_clie |      empresa      | rep_clie | limit_credit 
+----------+-------------------+----------+--------------
+     2111 | JCP Inc.          |      103 |     50000.00
+     2102 | First Corp.       |      101 |     65000.00
+     2123 | Carter & Sons     |      102 |     40000.00
+     2107 | Ace International |      110 |     35000.00
+     2115 | Smithson Corp.    |      101 |     20000.00
+     2112 | Zetacorp          |      108 |     50000.00
+     2121 | QMA Assoc.        |      103 |     45000.00
+     2114 | Orion Corp        |      102 |     20000.00
+     2108 | Holm & Landis     |      109 |     55000.00
+     2120 | Rico Enterprises  |      102 |     50000.00
+     2106 | Fred Lewis Corp.  |      102 |     65000.00
+     2119 | Solomon Inc.      |      109 |     25000.00
+     2118 | Midwest Systems   |      108 |     60000.00
+     2109 | Chen Associates   |      103 |     25000.00
+     2105 | AAA Investments   |      101 |     45000.00
+     2103 | Acme Mfg.         |      109 |     60000.00
+     2101 | Jones Mfg.        |      102 |     65000.00
+     2117 | J.P. Sinclair     |      102 |     35000.00
+     2122 | Three-Way Lines   |      102 |     30000.00
+(19 rows)
+
+training=> 
+```
 
 ## Exercici 19:
 
 Assigna una quota de 100000 a tots aquells venedors que actualment no tenen quota.
 
 
+```
+training=> SELECT * FROM rep_vendes WHERE quota IS NULL;
+
+
+ num_empl |    nom     | edat | oficina_rep |       carrec        | data_contracte | cap | quota |  vendes  
+----------+------------+------+-------------+---------------------+----------------+-----+-------+----------
+      110 | Tom Snyder |   41 |             | Representant Vendes | 1990-01-13     | 101 |       | 75985.00
+(1 row)
+
+```
+```
+training=> UPDATE rep_vendes SET quota = 100000 WHERE quota IS NULL; 
+UPDATE 1
+
+training=> SELECT * FROM rep_vendes WHERE quota = 100000;
+ num_empl |    nom     | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes  
+----------+------------+------+-------------+---------------------+----------------+-----+-----------+----------
+      110 | Tom Snyder |   41 |             | Representant Vendes | 1990-01-13     | 101 | 100000.00 | 75985.00
+(1 row)
+```
 
 ## Exercici 20:
 
 Eleva totes les quotes un 5%.
 
+```
+
+training=> UPDATE rep_vendes SET quota = quota+(quota*0.05);
+UPDATE 10
+training=> 
+
+ num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
+----------+---------------+------+-------------+---------------------+----------------+-----+-----------+-----------
+      105 | Bill Adams    |   37 |          13 | Representant Vendes | 1988-02-12     | 104 | 367500.00 | 367911.00
+      109 | Mary Jones    |   31 |          11 | Representant Vendes | 1989-10-12     | 106 | 315000.00 | 392725.00
+      102 | Sue Smith     |   48 |          21 | Representant Vendes | 1986-12-10     | 108 | 367500.00 | 474050.00
+      106 | Sam Clark     |   52 |          11 | VP Vendes           | 1988-06-14     |     | 288750.00 | 299912.00
+      110 | Tom Snyder    |   41 |             | Representant Vendes | 1990-01-13     | 101 |           |  75985.00
+      108 | Larry Fitch   |   62 |          21 | Dir Vendes          | 1989-10-12     | 106 | 367500.00 | 361865.00
+      107 | Nancy Angelli |   49 |          22 | Representant Vendes | 1988-11-14     | 108 | 315000.00 | 186042.00
+      104 | Bob Smith     |   33 |          11 | Dir Vendes          | 1987-05-19     | 106 | 189000.00 | 142594.00
+      101 | Dan Roberts   |   45 |          11 | Representant Vendes | 1986-10-20     | 104 | 283500.00 | 305673.00
+      103 | Paul Cruz     |   29 |          11 | Representant Vendes | 1987-03-01     | 104 | 259875.00 | 286775.00
+(10 rows)
+
+
+
+```
 
 
 ## Exercici 21:
 
 Eleva en 5000 el límit de crèdit de qualsevol client que ha fet una comanda d'import superior a 25000.
 
+SELECT * FROM comandes WHERE import > 25000;
+
+
+```
+training=> UPDATE clients
+
+        SET limit_credit = limit_credit + 5000
+        
+WHERE num_clie = ANY
+        (
+                SELECT num_clie
+                FROM COMANDES
+                WHERE import > 25000
+        
+        );
+UPDATE 19
+training=> 
+```
+
+
+```
+training=> SELECT * FROM CLIENTS;
+ num_clie |      empresa      | rep_clie | limit_credit 
+----------+-------------------+----------+--------------
+     2111 | JCP Inc.          |      103 |     55000.00
+     2102 | First Corp.       |      101 |     70000.00
+     2103 | Acme Mfg.         |      105 |     55000.00
+     2123 | Carter & Sons     |      102 |     45000.00
+     2107 | Ace International |      110 |     40000.00
+     2115 | Smithson Corp.    |      101 |     25000.00
+     2101 | Jones Mfg.        |      106 |     70000.00
+     2112 | Zetacorp          |      108 |     55000.00
+     2121 | QMA Assoc.        |      103 |     50000.00
+     2114 | Orion Corp        |      102 |     25000.00
+     2108 | Holm & Landis     |      109 |     60000.00
+     2117 | J.P. Sinclair     |      106 |     40000.00
+     2122 | Three-Way Lines   |      105 |     35000.00
+     2120 | Rico Enterprises  |      102 |     55000.00
+     2106 | Fred Lewis Corp.  |      102 |     70000.00
+     2119 | Solomon Inc.      |      109 |     30000.00
+     2118 | Midwest Systems   |      108 |     65000.00
+     2109 | Chen Associates   |      103 |     30000.00
+     2105 | AAA Investments   |      101 |     50000.00
+(19 rows)
+
+```
 
 
 ## Exercici 22:
 
-Reassigna tots els clients atesos pels venedors les vendes dels quals són menors al 80% de les seves quotes. Reassignar al venedor 105.
+Reassigna tots els clients atesos pels venedors, les vendes dels quals són menors al 80% de les seves quotes. Reassignar al venedor 105.
+
+```
+SELECT * FROM CLIENTS WHERE rep_clie = ANY (
+	SELECT num_empl 
+	FROM rep_vendes 
+	WHERE vendes < (quota*0.8));
+```
+
+```
+UPDATE clients SET rep_clie = 105
+WHERE rep_clie = ALL (
+	SELECT num_empl 
+	FROM rep_vendes 
+	WHERE vendes < (quota*0.8));
+```
+
+```
+SELECT clients.num_clie, clients.empresa, clients.rep_clie, limit_credit, rep_vendes.num_empl FROM CLIENTS JOIN REP_VENDES ON (clients.rep_clie = rep_vendes.num_empl) WHERE clients.rep_clie = ANY (
+	SELECT num_empl 
+	FROM rep_vendes 
+	WHERE vendes < (quota*0.8));
+
+```
+
+[REVISAR]
 
 ## Exercici 23:
 
 Feu que tots els venedors que atenen a més de tres clients estiguin sota de les ordres de Sam Clark (106).
 
+```
+training=> SELECT rep_clie, COUNT(rep_clie) FROM clients GROUP BY rep_clie HAVING COUNT(rep_clie) > 3; 
+ rep_clie | count 
+----------+-------
+      102 |     4
+(1 row)
+
+```
+
+```
+UPDATE rep_vendes SET num_empl = 106 WHERE num_empl = (SELECT rep_clie FROM clients GROUP BY rep_clie HAVING COUNT(rep_clie) > 3);
+```
+
+```
+training=> UPDATE rep_vendes SET num_empl = 106 WHERE num_empl IN (SELECT rep_clie FROM clients GROUP BY rep_clie HAVING COUNT(rep_clie) > 3);
+ERROR:  duplicate key value violates unique constraint "pk_rep_vendes_num_empl"
+DETAIL:  Key (num_empl)=(106) already exists.
+training=> 
+```
+
 ## Exercici 24:
 
 Augmenteu un 50% el límit de credit d'aquells clients que totes les seves comandes tenen un import major a 30000.
+
+```
+training=> SELECT (limit_credit+(limit_credit*0.5)) AS augment50per FROM clients;
+ augment50per 
+--------------
+    82500.000
+   105000.000
+    82500.000
+    67500.000
+    60000.000
+    37500.000
+   105000.000
+    82500.000
+    75000.000
+    37500.000
+    90000.000
+    60000.000
+    52500.000
+    82500.000
+   105000.000
+    45000.000
+    97500.000
+    45000.000
+    75000.000
+(19 rows)
+
+```
+
+```
+SELECT (limit_credit+(limit_credit*0.5)) AS augment50per FROM clients WHERE rep_clie = ANY (SELECT clie FROM comandes WHERE import > 30000);
+
+```
+
 
 ## Exercici 25:
 
 Disminuiu un 2% el preu d'aquells productes que tenen un estoc superior a 200 i no han tingut comandes.
 
+```
+
+```
+
+```
+
+```
+
+```
+
+```
+
 ## Exercici 26:
 
 Establiu un nou objectiu per aquelles oficines en que l'objectiu actual sigui inferior a les vendes. Aquest nou objectiu serà el doble de la suma de les vendes dels treballadors assignats a l'oficina.
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```
 
 ## Exercici 27:
 
