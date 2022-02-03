@@ -254,10 +254,12 @@ training=>
 
 ```
 
+
+DEFINITIVO
+
 ```
-DELETE FROM productes WHERE (id_fabricant, id_producte) IN (
-    SELECT comandes.producte, productes.id_fabricant, productes.id_producte FROM comandes RIGHT JOIN productes ON (comandes.producte = productes.id_producte) AND (comandes.fabricant = productes.id_fabricant) WHERE comandes.num_comanda IS NULL
-    );
+DELETE FROM productes
+WHERE id_producte IN (SELECT id_producte FROM productes_sense_comandes);
 ```
 
 
@@ -266,6 +268,16 @@ DELETE FROM productes WHERE (id_fabricant, id_producte) IN (
 ## Exercici 5
 
 A la base de dades training crear una taula temporal que substitueixi la taula "clients" però només ha de contenir aquells clients que no han fet comandes i tenen assignat un representant de vendes amb unes vendes inferiors al 110% de la seva quota.
+
+```
+CREATE LOCAL TEMPORARY TABLE clients
+```
+
+
+```
+
+```
+
 
 ## Exercici 6
 
