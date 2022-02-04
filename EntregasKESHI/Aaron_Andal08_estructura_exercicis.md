@@ -270,11 +270,30 @@ WHERE id_producte IN (SELECT id_producte FROM productes_sense_comandes);
 A la base de dades training crear una taula temporal que substitueixi la taula "clients" però només ha de contenir aquells clients que no han fet comandes i tenen assignat un representant de vendes amb unes vendes inferiors al 110% de la seva quota.
 
 ```
-CREATE LOCAL TEMPORARY TABLE clients
+CREATE LOCAL TEMPORARY TABLE clients2 AS (
+	SELECT num_clie FROM clients 
+	WHERE num_clie NOT IN (
+		SELECT clie
+		FROM comandes
+		) AND rep_clie = ANY (
+				SELECT num_empl 
+				FROM rep_vendes 
+				WHERE vendes < (quota*1.1)
+			)	
+);
+SELECT 4
 ```
 
 
 ```
+training=> SELECT * FROM clients2;
+ num_clie 
+----------
+     2115
+     2121
+     2122
+     2105
+(4 rows)
 
 ```
 
@@ -283,23 +302,59 @@ CREATE LOCAL TEMPORARY TABLE clients
 
 Escriu les sentències necessàries per a crear l'estructura de l'esquema proporcionat de la base de dades training. Justifica les accions a realitzar en modificar/actualitzar les claus primàries.
 
+```
+
+
+```
+
 
 ## Exercici 7
 
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que afegeixi un camp anomenat "nif" a la taula "clients" que permeti emmagatzemar el NIF de cada client. També s'ha de procurar que el NIF de cada client sigui únic.
 
+```
+ALTER TABLE clients
+ADD COLUMN nif CHAR(9) CONSTRAINT nif_unique UNIQUE;
+```
+
+```
+training=> ALTER TABLE clients
+ADD COLUMN nif CHAR(9) CONSTRAINT nif_unique UNIQUE;
+ALTER TABLE
+training=> 
+
+```
+
 ## Exercici 8
 
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que afegeixi un camp anomenat "tel" a la taula "clients" que permeti emmagatzemar el número de telèfon de cada client. També s'ha de procurar que aquest contingui 9 xifres.
+
+```
+ALTER TABLE clients
+ADD COLUMN tel INTEGER:
+
+ALTER TABLE clients
+ADD CONSTRAINT clients tel_ck
+	CHECK(tel >= 100000000 AND tel <= 99999999);
+```
 
 ## Exercici 9
 
 Escriu les sentències necessàries per modificar la base de dades training proporcionada. Cal que s'impedeixi que els noms dels representants de vendes i els noms dels clients estiguin buits, és a dir que ni siguin nuls ni continguin la cadena buida.
 
+```
+
+
+```
+
 ## Exercici 10
 
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que procuri que l'edat dels representants de vendes no sigui inferior a 18 anys ni superior a 65.
 
+```
+
+
+```
 
 ## Exercici 11
 
