@@ -303,26 +303,67 @@ training=> SELECT * FROM clients2;
 Escriu les sentències necessàries per a crear l'estructura de l'esquema proporcionat de la base de dades training. Justifica les accions a realitzar en modificar/actualitzar les claus primàries.
 
 ```
+CREATE TABLE IF NOT EXISTS PRODUCTES (
+    PRIMARY KEY(id_fabricant,id_producte),
+    id_fabricant        VARCHAR(5),
+    id_producte         VARCHAR(5),
+    descripcio          VARCHAR(20)     NOT NULL,
+    preu                NUMERIC(8,2)    NOT NULL,
+    estoc               INT             NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS OFICINES (
+    PRIMARY KEY(oficina),
+    oficina             SMALLINT,
+    ciutat              VARCHAR(15)     NOT NULL,
+    regio               VARCHAR(10)     NOT NULL,
+    director            SMALLINT,
+    objectiu            NUMERIC(9,2),
+    vendes              NUMERIC(9,2)    NOT NULL DEFAULT 0
+);
 
 
+CREATE TABLE IF NOT EXISTS REP_VENDES (
+    PRIMARY KEY(num_empl),
+    num_empl            SMALLINT,
+    nom                 VARCHAR(30)     NOT NULL,
+    edat                SMALLINT,
+    oficina_rep         SMALLINT,
+    carrec              VARCHAR(20),
+    data_contracte      DATE            NOT NULL,
+    cap                 SMALLINT,
+    quota               NUMERIC(8,2) NOT NULL DEFAULT 250000,
+    vendes              NUMERIC(8,2) NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS CLIENTS (
+    PRIMARY KEY(num_clie),
+    num_clie            SMALLINT,
+    empresa             VARCHAR(20)     NOT NULL,
+    rep_clie            SMALLINT        NOT NULL,
+    limit_credit        NUMERIC(8,2)
+);
+
+CREATE TABLE IF NOT EXISTS COMANDES (
+    PRIMARY KEY(num_comanda)
+    num_comanda         INT,
+    data                DATE            NOT NULL,
+    clie                SMALLINT        NOT NULL,
+    rep                 SMALLINT,
+    fabricant           VARCHAR(3)      NOT NULL,
+    producte            VARCHAR(5)      NOT NULL,
+    quantitat           SMALLINT        NOT NULL,
+    import              NUMERIC(7,2)    NOT NULL DEFAULT 0
+);
 ```
-
 
 ## Exercici 7
 
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que afegeixi un camp anomenat "nif" a la taula "clients" que permeti emmagatzemar el NIF de cada client. També s'ha de procurar que el NIF de cada client sigui únic.
 
 ```
-ALTER TABLE clients
-ADD COLUMN nif CHAR(9) CONSTRAINT nif_unique UNIQUE;
-```
-
-```
-training=> ALTER TABLE clients
-ADD COLUMN nif CHAR(9) CONSTRAINT nif_unique UNIQUE;
-ALTER TABLE
-training=> 
-
+ALTER TABLE clients 
+  ADD nif VARCHAR(9) UNIQUE;
 ```
 
 ## Exercici 8
@@ -330,12 +371,11 @@ training=>
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que afegeixi un camp anomenat "tel" a la taula "clients" que permeti emmagatzemar el número de telèfon de cada client. També s'ha de procurar que aquest contingui 9 xifres.
 
 ```
+ALTER TABLE clients 
+  ADD tel INT;
+  
 ALTER TABLE clients
-ADD COLUMN tel INTEGER:
-
-ALTER TABLE clients
-ADD CONSTRAINT clients tel_ck
-	CHECK(tel >= 100000000 AND tel <= 99999999);
+    ADD CONSTRAINT clients_tel_ck CHECK(length(tel::text) = 9);
 ```
 
 ## Exercici 9
@@ -343,8 +383,11 @@ ADD CONSTRAINT clients tel_ck
 Escriu les sentències necessàries per modificar la base de dades training proporcionada. Cal que s'impedeixi que els noms dels representants de vendes i els noms dels clients estiguin buits, és a dir que ni siguin nuls ni continguin la cadena buida.
 
 ```
-
-
+ALTER TABLE rep_vendes 
+  ADD constraint rep_nom_ck CHECK (nom <> '' OR nom IS NOT NULL);
+  
+ALTER TABLE clients 
+  ADD constraint cli_empresa_ck CHECK (empresa <> '' OR empresa IS NOT NULL);
 ```
 
 ## Exercici 10
@@ -352,16 +395,82 @@ Escriu les sentències necessàries per modificar la base de dades training prop
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que procuri que l'edat dels representants de vendes no sigui inferior a 18 anys ni superior a 65.
 
 ```
-
-
+ALTER TABLE rep_vendes 
+  ADD constraint rep_edad_ck CHECK (edat>=18 OR edat<=65);
 ```
 
 ## Exercici 11
 
 Escriu una sentència que permeti modificar la base de dades training proporcionada. Cal que esborri el camp "carrec" de la taula "rep_vendes" esborrant també les possibles restriccions i referències que tingui.
 
+```
+ALTER TABLE rep_vendes 
+  DROP carrec CASCADE;
+```
+
 
 ## Exercici 12
 
 Escriu les sentències necessàries per modificar la base de dades training proporcionada per tal que aquesta tingui integritat referencial. Justifica les accions a realitzar per modificar les dades.
 
+```
+CREATE TABLE IF NOT EXISTS PRODUCTES (
+    PRIMARY KEY(id_fabricant,id_producte),
+    id_fabricant        VARCHAR(5),
+    id_producte         VARCHAR(5),
+    descripcio          VARCHAR(20)     NOT NULL,
+    preu                NUMERIC(8,2)    NOT NULL,
+    estoc               INT             NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS OFICINES (
+    PRIMARY KEY(oficina),
+    oficina             SMALLINT,
+    ciutat              VARCHAR(15)     NOT NULL,
+    regio               VARCHAR(10)     NOT NULL,
+    director            SMALLINT,
+    objectiu            NUMERIC(9,2),
+    vendes              NUMERIC(9,2)    NOT NULL DEFAULT 0
+);
+
+
+CREATE TABLE IF NOT EXISTS REP_VENDES (
+    PRIMARY KEY(num_empl),
+    num_empl            SMALLINT,
+    nom                 VARCHAR(30)     NOT NULL,
+    edat                SMALLINT,
+    oficina_rep         SMALLINT,
+    carrec              VARCHAR(20),
+    data_contracte      DATE            NOT NULL,
+    cap                 SMALLINT,
+    quota               NUMERIC(8,2) NOT NULL DEFAULT 250000,
+    vendes              NUMERIC(8,2) NOT NULL DEFAULT 0,
+                        CONSTRAINT CK_REP_VENDES_NOM CHECK(NOM = INITCAP(NOM)),
+	                    CONSTRAINT CK_REP_VENDES_EDAT CHECK(EDAT>0),
+	                    CONSTRAINT CK_REP_VENDES_QUOTA CHECK(QUOTA>0),
+	                    CONSTRAINT FK_REP_VENDES_OFICINA_REP FOREIGN KEY(oficina_rep) REFERENCES OFICINES(oficina)	
+);
+
+CREATE TABLE IF NOT EXISTS CLIENTS (
+    PRIMARY KEY(num_clie),
+    num_clie            SMALLINT,
+    empresa             VARCHAR(20)     NOT NULL,
+    rep_clie            SMALLINT        NOT NULL,
+    limit_credit        NUMERIC(8,2),
+                        CONSTRAINT FK_CLIENTS_REP_CLIE FOREIGN KEY(REP_CLIE) REFERENCES REP_VENDES(NUM_EMPL)
+);
+
+CREATE TABLE IF NOT EXISTS COMANDES (
+    PRIMARY KEY(num_comanda)
+    num_comanda         INT,
+    data                DATE            NOT NULL,
+    clie                SMALLINT        NOT NULL,
+    rep                 SMALLINT,
+    fabricant           VARCHAR(3)      NOT NULL,
+    producte            VARCHAR(5)      NOT NULL,
+    quantitat           SMALLINT        NOT NULL,
+    import              NUMERIC(7,2)    NOT NULL DEFAULT 0,
+	                    CONSTRAINT FK_COMANDES_REP FOREIGN KEY(REP) REFERENCES REP_VENDES(NUM_EMPL),
+	                    CONSTRAINT FK_COMANDES_CLIE FOREIGN KEY(CLIE) REFERENCES CLIENTS(NUM_CLIE)
+);
+```
