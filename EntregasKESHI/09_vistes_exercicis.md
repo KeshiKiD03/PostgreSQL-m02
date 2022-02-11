@@ -2,8 +2,73 @@
 
 ## Exercici 1
 
-Defineix una vista anomenada "oficina_est" que contingui únicament les dades de
-les oficines de la regió est.
+Defineix una vista anomenada "oficina_est" que contingui únicament les dades de les oficines de la regió est.
+
+1.Veiem els usuaris de l'oficina = 'Est'
+
+```
+training=> SELECT * FROM oficines WHERE regio = 'Est';
+ oficina |  ciutat  | regio | director | objectiu  |  vendes   
+---------+----------+-------+----------+-----------+-----------
+      11 | New York | Est   |      106 | 575000.00 | 692637.00
+      12 | Chicago  | Est   |      104 | 800000.00 | 735042.00
+      13 | Atlanta  | Est   |      105 | 350000.00 | 367911.00
+(3 rows)
+```
+
+2. Creem la vista oficina_est
+
+CREATE OR REPLACE VIEW oficina_est AS 
+	SELECT * FROM oficines WHERE regio = 'Est'
+	WITH LOCAL CHECK OPTION;
+	
+```
+training=> CREATE OR REPLACE VIEW oficina_est AS 
+        SELECT * FROM oficines WHERE regio = 'Est'
+        WITH LOCAL CHECK OPTION;
+CREATE VIEW
+training=> 
+
+```
+
+3. Veiem la vista creada. 
+
+```
+training=> SELECT * FROM oficina_est
+training-> ;
+ oficina |  ciutat  | regio | director | objectiu  |  vendes   
+---------+----------+-------+----------+-----------+-----------
+      11 | New York | Est   |      106 | 575000.00 | 692637.00
+      12 | Chicago  | Est   |      104 | 800000.00 | 735042.00
+      13 | Atlanta  | Est   |      105 | 350000.00 | 367911.00
+(3 rows)
+
+```
+
+\d+ 
+
+```
+                                 View "public.oficina_est"
+  Column  |         Type          | Collation | Nullable | Default | Storage  | Description 
+----------+-----------------------+-----------+----------+---------+----------+-------------
+ oficina  | smallint              |           |          |         | plain    | 
+ ciutat   | character varying(15) |           |          |         | extended | 
+ regio    | character varying(10) |           |          |         | extended | 
+ director | smallint              |           |          |         | plain    | 
+ objectiu | numeric(9,2)          |           |          |         | main     | 
+ vendes   | numeric(9,2)          |           |          |         | main     | 
+View definition:
+ SELECT oficines.oficina,
+    oficines.ciutat,
+    oficines.regio,
+    oficines.director,
+    oficines.objectiu,
+    oficines.vendes
+   FROM oficines
+  WHERE oficines.regio::text = 'Est'::text;
+Options: check_option=local
+
+```
 
 
 ## Exercici 2
@@ -11,11 +76,79 @@ les oficines de la regió est.
 Crear una vista de nom "rep_oest" que mostri les dades dels venedors de la
 regió oest.
 
+1. Filtrem per saber els usuaris de l'oficina_rep
+
+```
+SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHERE regio = 'Oest');
+
+```
+```
+ num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
+----------+---------------+------+-------------+---------------------+----------------+-----+-----------+-----------
+      102 | Sue Smith     |   48 |          21 | Representant Vendes | 1986-12-10     | 108 | 350000.00 | 474050.00
+      108 | Larry Fitch   |   62 |          21 | Dir Vendes          | 1989-10-12     | 106 | 350000.00 | 361865.00
+      107 | Nancy Angelli |   49 |          22 | Representant Vendes | 1988-11-14     | 108 | 300000.00 | 186042.00
+(3 rows)
+
+```
+
+2. Creem la vista.
+
+CREATE OR REPLACE VIEW rep_oest AS 
+	SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHERE regio = 'Oest');
+	
+```
+training=> CREATE OR REPLACE VIEW rep_oest AS 
+        SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHERE regio = 'Oest');
+CREATE VIEW
+
+```
+
+```
+ num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
+----------+---------------+------+-------------+---------------------+----------------+-----+-----------+-----------
+      102 | Sue Smith     |   48 |          21 | Representant Vendes | 1986-12-10     | 108 | 350000.00 | 474050.00
+      108 | Larry Fitch   |   62 |          21 | Dir Vendes          | 1989-10-12     | 106 | 350000.00 | 361865.00
+      107 | Nancy Angelli |   49 |          22 | Representant Vendes | 1988-11-14     | 108 | 300000.00 | 186042.00
+(3 rows)
+
+```
+	
 
 ## Exercici 3
 
 Crea una vista temporal de nom "comandes_sue" que contingui únicament les
 comandes fetes per clients assignats la representant de vendes Sue.
+
+
+1. Comandes de la Sue Smith
+```
+training=> SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
+
+```
+
+2. Creem la Vista
+
+CREATE OR REPLACE VIEW comandes_sue AS 
+	SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
+	
+```
+training=> CREATE OR REPLACE VIEW comandes_sue AS 
+        SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
+CREATE VIEW
+
+```
+
+```
+ num_comanda |    data    | clie | rep | fabricant | producte | quantitat |  import  
+-------------+------------+------+-----+-----------+----------+-----------+----------
+      112979 | 1989-10-12 | 2114 | 102 | aci       | 4100z    |         6 | 15000.00
+      113048 | 1990-02-10 | 2120 | 102 | imm       | 779c     |         2 |  3750.00
+      112993 | 1989-01-04 | 2106 | 102 | rei       | 2a45c    |        24 |  1896.00
+      113065 | 1990-02-27 | 2106 | 102 | qsa       | xk47     |         6 |  2130.00
+(4 rows)
+
+```
 
 ## Exercici 4
 
