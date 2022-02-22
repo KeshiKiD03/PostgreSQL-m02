@@ -1,0 +1,1 @@
+http://geotalleres.readthedocs.io/es/latest/conceptos-sql/conceptos_sql.html
