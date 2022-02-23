@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW oficina_est AS
 	SELECT * FROM oficines WHERE regio = 'Est'
 	WITH LOCAL CHECK OPTION;
 	
-```
+```sql
 training=> CREATE OR REPLACE VIEW oficina_est AS 
         SELECT * FROM oficines WHERE regio = 'Est'
         WITH LOCAL CHECK OPTION;
@@ -33,7 +33,7 @@ training=>
 
 3. Veiem la vista creada. 
 
-```
+```sql
 training=> SELECT * FROM oficina_est
 training-> ;
  oficina |  ciutat  | regio | director | objectiu  |  vendes   
@@ -47,7 +47,7 @@ training-> ;
 
 \d+ 
 
-```
+```sql
                                  View "public.oficina_est"
   Column  |         Type          | Collation | Nullable | Default | Storage  | Description 
 ----------+-----------------------+-----------+----------+---------+----------+-------------
@@ -78,7 +78,7 @@ regió oest.
 
 1. Filtrem per saber els usuaris de l'oficina_rep
 
-```
+```sql
 SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHERE regio = 'Oest');
 
 ```
@@ -97,14 +97,14 @@ SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHER
 CREATE OR REPLACE VIEW rep_oest AS 
 	SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHERE regio = 'Oest');
 	
-```
+```sql
 training=> CREATE OR REPLACE VIEW rep_oest AS 
         SELECT * FROM rep_vendes WHERE oficina_rep IN (SELECT oficina FROM oficines WHERE regio = 'Oest');
 CREATE VIEW
 
 ```
 
-```
+```sql
  num_empl |      nom      | edat | oficina_rep |       carrec        | data_contracte | cap |   quota   |  vendes   
 ----------+---------------+------+-------------+---------------------+----------------+-----+-----------+-----------
       102 | Sue Smith     |   48 |          21 | Representant Vendes | 1986-12-10     | 108 | 350000.00 | 474050.00
@@ -122,7 +122,7 @@ comandes fetes per clients assignats la representant de vendes Sue.
 
 
 1. Comandes de la Sue Smith
-```
+```sql
 training=> SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
 
 ```
@@ -132,14 +132,14 @@ training=> SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes 
 CREATE OR REPLACE VIEW comandes_sue AS 
 	SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
 	
-```
+```sql
 training=> CREATE OR REPLACE VIEW comandes_sue AS 
         SELECT * FROM comandes WHERE rep IN (SELECT num_empl FROM rep_vendes WHERE nom = 'Sue Smith');
 CREATE VIEW
 
 ```
 
-```
+```sql
  num_comanda |    data    | clie | rep | fabricant | producte | quantitat |  import  
 -------------+------------+------+-----+-----------+----------+-----------+----------
       112979 | 1989-10-12 | 2114 | 102 | aci       | 4100z    |         6 | 15000.00
@@ -155,7 +155,7 @@ CREATE VIEW
 Crea una vista de nom "clientes_vip" mostri únicament aquells clients que la
 suma dels imports de les seves comandes superin 30000.
 
-```
+```sql
 training=*> CREATE VIEW clients_vip
                     AS SELECT cli.*
                          FROM clients cli
@@ -180,7 +180,7 @@ training=*> SELECT * FROM clients_vip;
 Crear una vista de nom "info_rep" amb les següents dades dels venedors:
 num_empl, nombre, oficina_rep.
 
-```
+```sql
 training=*> CREATE VIEW info_rep
                     AS SELECT num_empl, nom, oficina_rep
                          FROM rep_vendes;
@@ -206,7 +206,7 @@ training=*> SELECT * FROM info_rep;
 Crear una vista de nom "info_oficina" que mostri les oficines amb
 l'identificador de l'oficina, la ciutat i la regió.
 
-```
+```sql
 training=*> CREATE VIEW info_oficina
                     AS SELECT oficina, ciutat, regio
                          FROM oficines;
@@ -227,7 +227,7 @@ training=*> SELECT * FROM info_oficina;
 Crear una vista de nom "info_clie" que contingui el nom de l'empresa dels
 clients i l'identificador del venedor que tenen assignat.
 
-```
+```sql
 training=*> CREATE VIEW info_clie
                     AS SELECT empresa, rep_clie
                          FROM clients;
@@ -248,7 +248,7 @@ Crea una vista de nom "clie_bill" que conté el número de client, el nom de
 empresa i el límit de crèdit de tots els clients assignats al representant de
 vendes "Bill Adams".
 
-```
+```sql
 training=*> CREATE VIEW clie_bill
                     AS SELECT num_clie, empresa, limit_credit
                          FROM clients
@@ -270,7 +270,7 @@ Crea una vista de nom comanda_per_rep que conté les següents dades de les
 comandes de cada venedor: id_representant_vendes, quantitat_pedidos,
 import_total, import_minim, import_maxim, import_promig.
 
-```
+```sql
 training=*> CREATE VIEW comanda_per_rep
                     AS SELECT rep AS id_representant_vendes,
                               COUNT(*) AS quantitat_pedidos,
@@ -302,7 +302,7 @@ de vendes, números de comandes, import total de les comandes i el promig de les
 comandes per a cada venedor. S'han d'ordenar per tal que primer es mostrin els
 que tenen major import total.
 
-```
+```sql
 training=*> CREATE VIEW top_rep
                     AS SELECT nom, quantitat_pedidos, import_total,
                               import_promig
@@ -332,7 +332,7 @@ training=*> SELECT * FROM top_rep;
 Crear una vista de nom "info_comanda" amb les dades de les comandes però amb
 els noms del client i venedor en lloc dels seus identificadors.
 
-```
+```sql
 training=*> CREATE VIEW info_comanda
                     AS SELECT num_comanda, data, clie.empresa AS nom_client,
                               r.nom AS nom_rep, fabricant, producte,
@@ -360,7 +360,7 @@ Crear una vista anomenada "clie_rep" que mostri l'import total de les comandes
 que ha fet cada client a cada representant de vendes. Cal mostrar el nom de
 l'empresa i el nom del representant de vendes.
 
-```
+```sql
 training=*> CREATE VIEW clie_rep
                     AS SELECT nom_client, nom_rep, SUM(import)
                         FROM info_comanda
