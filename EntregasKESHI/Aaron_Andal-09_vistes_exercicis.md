@@ -6,7 +6,7 @@ Defineix una vista anomenada "oficina_est" que contingui únicament les dades de
 
 1.Veiem els usuaris de l'oficina = 'Est'
 
-```
+```sql
 training=> SELECT * FROM oficines WHERE regio = 'Est';
  oficina |  ciutat  | regio | director | objectiu  |  vendes   
 ---------+----------+-------+----------+-----------+-----------
