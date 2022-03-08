@@ -19,7 +19,13 @@ SELECT valor
  WHERE id = 10;
 ```
 
-* Realiza el primer **SELECT** pero no se guarda la información y porque hace un ROLLBACK.
+* Realiza un INSERT a la tabla PUNTOS y añade dos valores nuevos.
+
+* Empieza la transacción con BEGIN. Antes de ello hay un autocomit.
+
+* Realiza un UPDATE de la tabla PUNTOS y cambia el valor de 4 filtrando a ID = 10.
+
+* Hace un ROLLBACK y no guardará el UPDATE y volverá atrás y saldrá de la transacción.
 
 * Muestra el último select **SELECT**
 
@@ -44,8 +50,16 @@ SELECT valor
  WHERE id = 20;
 ```
 
-* El último SELECT tendrá un nuevo valor (20 y 4).
 
+* Realiza un INSERT a la tabla PUNTOS y añade dos valores nuevos.
+
+* Empieza la transacción con BEGIN. Antes de ello hay un autocomit.
+
+* Realiza un UPDATE de la tabla PUNTOS y cambia el valor de 4 filtrando a ID = 10.
+
+* Se realiza un COMMIT, se guarda todo lo que hay antes (DENTRO DEL COMIT). Saca de la TRANSACCIÓN.
+
+* Muestra EL SELECT FINAL.
 
 ## Exercici 3
 
@@ -71,9 +85,9 @@ SELECT valor
  WHERE id = 30;
 ```
 
-* Se realiza el INSERT 
+* Se realiza el INSERT.
 
-* Se inicializa un BEGIN y un SAVE point.
+* Se inicializa un BEGIN y posteriormente un UPDATE y un SAVEPOINT al final.
 
 * Se vuelve a hacer otro INSERT de una fila nueva.
 
@@ -263,7 +277,7 @@ UPDATE punts
    SET valor = 8
  WHERE id = 81; -- Connexió 2
 
-# Se quedará pillada la conexión de BOB.
+# Se quedará pillada la conexión de BOB. # DEADLOCK HACE UN ROLLBACK AUTOMÁTICO
 
 UPDATE punts
    SET valor = 10
@@ -470,3 +484,4 @@ SELECT valor
 -- MUESTRA 8
 
 ```
+
