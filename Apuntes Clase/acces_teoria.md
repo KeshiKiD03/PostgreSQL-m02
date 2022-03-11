@@ -1,5 +1,67 @@
 # Accés local i remot
 
+VIM
+
+yyp --> Copiar y pegar una linea
+
+```
+host    all             all             127.0.0.1/32            md5
+host    all             isx6223835      10.200.244.204/32       trust
+host    all             guest	        10.200.244.204/32       pam
+
+
+```
+
+* Conectarse como super usuario mamado postgres - template1 madre
+```
+sudo -u postgres psql template1
+```
+
+```
+template1=# CREATE USER isx6223835
+template1-# ;
+CREATE ROLE
+template1=# CREATE USER guest     
+;
+CREATE ROLE
+```
+```
+template1=# \c training;
+You are now connected to database "training" as user "postgres".
+training=# GRANT SELECT ON oficines TO guest;
+GRANT
+
+training=# 
+
+```
+
+* Dar permisos
+```
+training=# GRANT SELECT ON comandes TO guest;
+GRANT
+training=# GRANT SELECT ON productes TO guest;
+GRANT
+training=# GRANT SELECT ON productes TO isx6223835;
+GRANT
+training=# GRANT SELECT ON oficines TO isx6223835;
+GRANT
+training=# GRANT SELECT ON comandes TO isx6223835;
+GRANT
+training=# GRANT SELECT ON rep_vendes TO isx6223835;
+GRANT
+training=# GRANT SELECT ON clients TO isx6223835;
+GRANT
+....
+```
+
+* Cambiar contraseña
+```
+template1=# ALTER USER guest PASSWORD 'guest';
+ALTER ROLE
+template1=# 
+
+```
+
 ## Autenticació
 
 ### Fitxer d'autenticació de PostgreSQL
@@ -15,6 +77,14 @@ Si no ens surt res potser és perquè no hem inicialitzat la base de dades com a
 
 ```
 updatedb
+```
+
+Modificamos el Postgresql.conf
+```
+sudo vim /etc/postgresql/13/main/postgresql.conf
+```
+```
+listen_addresses = '*'          # what IP address(es) to listen on;
 ```
 
 A cada línia d'aquest fitxer s'especifica: 
@@ -129,6 +199,12 @@ Si creem un rol que no pot fer login el podem entendre com un grup. Podem afegir
 ## Accés
 ```
 $ psql -h ip_servidor|nom_servidor -U nom_usuari nom_bd
+```
+
+## PERMISOS
+
+```
+GRANT SELECT ON rep_vendes TO guest;
 ```
 
 ## Troubleshooting
