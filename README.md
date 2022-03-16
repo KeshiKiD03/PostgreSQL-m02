@@ -8,9 +8,9 @@
 
 * **CHEATSHEET KESHI [01]**: [Consultas Simples](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-01)
 
-* **CHEATSHEET KESHI [02]**: [RAID](https://github.com/KeshiKiD03/lvm/tree/main/RAID)
+* **CHEATSHEET KESHI [02]**: [UNION](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-02)
 
-* **CHEATSHEET KESHI [03]**: [GPG](https://github.com/KeshiKiD03/lvm/tree/main/GPG
+* **CHEATSHEET KESHI [03]**: [MultiTabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-03)
 
 # CHEATSHEET KESHI [01]
 
