@@ -1,4 +1,5 @@
-General
+* General
+```
   \copyright             show PostgreSQL usage and distribution terms
   \crosstabview [COLUMNS] execute query and display results in crosstab
   \errverbose            show most recent error message at maximum verbosity
@@ -9,14 +10,18 @@ General
   \gx [FILE]             as \g, but forces expanded output mode
   \q                     quit psql
   \watch [SEC]           execute query every SEC seconds
+```
 
-Help
+* Help
+```
   \? [commands]          show help on backslash commands
   \? options             show help on psql command-line options
   \? variables           show help on special variables
   \h [NAME]              help on syntax of SQL commands, * for all commands
+```
 
-Query Buffer
+* Query Buffer
+```
   \e [FILE] [LINE]       edit the query buffer (or file) with external editor
   \ef [FUNCNAME [LINE]]  edit function definition with external editor
   \ev [VIEWNAME [LINE]]  edit view definition with external editor
@@ -24,23 +29,28 @@ Query Buffer
   \r                     reset (clear) the query buffer
   \s [FILE]              display history or save it to file
   \w FILE                write query buffer to file
+```
 
-Input/Output
+* Input/Output
+```
   \copy ...              perform SQL COPY with data stream to the client host
   \echo [STRING]         write string to standard output
   \i FILE                execute commands from file
   \ir FILE               as \i, but relative to location of current script
   \o [FILE]              send all query results to file or |pipe
   \qecho [STRING]        write string to query output stream (see \o)
+```
 
-Conditional
+* Conditional
+```
   \if EXPR               begin conditional block
   \elif EXPR             alternative within current conditional block
   \else                  final alternative within current conditional block
   \endif                 end conditional block
+```
 
-
-Informational
+* Informational
+```
   (options: S = show system objects, + = additional detail)
   \d[S+]                 list tables, views, and sequences
   \d[S+]  NAME           describe table, view, sequence, or index
@@ -86,11 +96,11 @@ Informational
   \sf[+]  FUNCNAME       show a function's definition
   \sv[+]  VIEWNAME       show a view's definition
   \z      [PATTERN]      same as \dp
+```
 
 
-
-
-Formatting
+* Formatting
+```
   \a                     toggle between unaligned and aligned output mode
   \C [STRING]            set table title, or unset if none
   \f [STRING]            show or set field separator for unaligned query output
@@ -105,28 +115,36 @@ Formatting
   \t [on|off]            show only rows (currently off)
   \T [STRING]            set HTML <table> tag attributes, or unset if none
   \x [on|off|auto]       toggle expanded output (currently off)
+```
 
-Connection
+* Connection
+```
   \c[onnect] {[DBNAME|- USER|- HOST|- PORT|-] | conninfo}
                          connect to new database (currently "training")
   \conninfo              display information about current connection
   \encoding [ENCODING]   show or set client encoding
   \password [USERNAME]   securely change the password for a user
+```
 
-Operating System
+* Operating System
+```
   \cd [DIR]              change the current working directory
   \setenv NAME [VALUE]   set or unset environment variable
   \timing [on|off]       toggle timing of commands (currently off)
   \! [COMMAND]           execute command in shell or start interactive shell
+```
 
-Variables
+* Variables
+```
   \prompt [TEXT] NAME    prompt user to set internal variable
   \set [NAME [VALUE]]    set internal variable, or list all if no parameters
   \unset NAME            unset (delete) internal variable
+```
 
-Large Objects
+* Large Objects
+```
   \lo_export LOBOID FILE
   \lo_import FILE [COMMENT]
   \lo_list
   \lo_unlink LOBOID      large object operations
-
+```
