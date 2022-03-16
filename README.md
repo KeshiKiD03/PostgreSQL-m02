@@ -40,7 +40,7 @@
 
 # POSTGRESQL
 
-* **Manual de PostgreSQL - Cheat Sheet**: [CHEATSHEET_POSTGRESQL](https://github.com/KeshiKiD03/m02/Help-Postgres.md)
+* **Manual de PostgreSQL - Cheat Sheet**: [CHEATSHEET_POSTGRESQL](https://github.com/KeshiKiD03/m02/blob/main/Help-Postgres.md)
 
 ![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/SQL-Commands.png)
 
