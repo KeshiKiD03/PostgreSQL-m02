@@ -1,4 +1,4 @@
-* General
+## General
 ```
   \copyright             show PostgreSQL usage and distribution terms
   \crosstabview [COLUMNS] execute query and display results in crosstab
@@ -12,15 +12,15 @@
   \watch [SEC]           execute query every SEC seconds
 ```
 
-* Help
+## Help
 ```
   \? [commands]          show help on backslash commands
   \? options             show help on psql command-line options
   \? variables           show help on special variables
-  \h [NAME]              help on syntax of SQL commands, * for all commands
+  \h [NAME]              help on syntax of SQL commands, ## for all commands
 ```
 
-* Query Buffer
+## Query Buffer
 ```
   \e [FILE] [LINE]       edit the query buffer (or file) with external editor
   \ef [FUNCNAME [LINE]]  edit function definition with external editor
@@ -31,7 +31,7 @@
   \w FILE                write query buffer to file
 ```
 
-* Input/Output
+## Input/Output
 ```
   \copy ...              perform SQL COPY with data stream to the client host
   \echo [STRING]         write string to standard output
@@ -41,7 +41,7 @@
   \qecho [STRING]        write string to query output stream (see \o)
 ```
 
-* Conditional
+## Conditional
 ```
   \if EXPR               begin conditional block
   \elif EXPR             alternative within current conditional block
@@ -49,7 +49,7 @@
   \endif                 end conditional block
 ```
 
-* Informational
+## Informational
 ```
   (options: S = show system objects, + = additional detail)
   \d[S+]                 list tables, views, and sequences
@@ -99,7 +99,7 @@
 ```
 
 
-* Formatting
+## Formatting
 ```
   \a                     toggle between unaligned and aligned output mode
   \C [STRING]            set table title, or unset if none
@@ -117,7 +117,7 @@
   \x [on|off|auto]       toggle expanded output (currently off)
 ```
 
-* Connection
+## Connection
 ```
   \c[onnect] {[DBNAME|- USER|- HOST|- PORT|-] | conninfo}
                          connect to new database (currently "training")
@@ -126,7 +126,7 @@
   \password [USERNAME]   securely change the password for a user
 ```
 
-* Operating System
+## Operating System
 ```
   \cd [DIR]              change the current working directory
   \setenv NAME [VALUE]   set or unset environment variable
@@ -134,14 +134,14 @@
   \! [COMMAND]           execute command in shell or start interactive shell
 ```
 
-* Variables
+## Variables
 ```
   \prompt [TEXT] NAME    prompt user to set internal variable
   \set [NAME [VALUE]]    set internal variable, or list all if no parameters
   \unset NAME            unset (delete) internal variable
 ```
 
-* Large Objects
+## Large Objects
 ```
   \lo_export LOBOID FILE
   \lo_import FILE [COMMENT]
