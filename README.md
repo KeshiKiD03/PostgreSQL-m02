@@ -4,17 +4,17 @@
 
 # UF2 - Llenguatges SQL: DML i DDL.
 
-### INDEX
+## INDEX
 
-* **KESHI CHEAT SHEET 01**: [Consultas Simples](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-01)
+* **CHEATSHEET KESHI [01]**: [Consultas Simples](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-01)
 
-* **KESHI CHEAT SHEET 02**: [RAID](https://github.com/KeshiKiD03/lvm/tree/main/RAID)
+* **CHEATSHEET KESHI [02]**: [RAID](https://github.com/KeshiKiD03/lvm/tree/main/RAID)
 
-* **KESHI CHEAT SHEET 03**: [GPG](https://github.com/KeshiKiD03/lvm/tree/main/GPG
+* **CHEATSHEET KESHI [03]**: [GPG](https://github.com/KeshiKiD03/lvm/tree/main/GPG
 
-### CHEATSHEET KESHI [01]
+# CHEATSHEET KESHI [01]
 
-### CONSULTAS SIMPLES
+## CONSULTAS SIMPLES
 
 ```sql
 SELECT * 
