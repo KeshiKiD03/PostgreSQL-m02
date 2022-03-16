@@ -1,3 +1,5 @@
+# CHEATSHEET KESHI [02]
+
 # Clàusula UNION
 
 Resolem un parell de consultes simples:

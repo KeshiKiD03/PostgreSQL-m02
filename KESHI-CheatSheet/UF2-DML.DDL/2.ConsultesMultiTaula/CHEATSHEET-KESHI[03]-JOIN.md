@@ -1,3 +1,5 @@
+# CHEATSHEET KESHI [03]
+
 # JOIN
 
 * Utilitzem la clàusula JOIN per a consultar dades que es troben en més d’una taula.
@@ -72,81 +74,18 @@ ON taula1.clau_forana = taula2.clau_primaria;
 * És suficient canviar l’ordre de les taules, però quan hi ha més de dues taules podria resultar + còmode no canviar-ho.
 
 
-```sql
-
-```
-
-
-```sql
-
-```
-
 
 #### LEFT JOIN
 
-```sql
-
-```
-
-
-```sql
-
-```
-
-
-```sql
-
-```
-
-
-```sql
-
-```
 
 
 
 #### RIGHT JOIN
 
-```sql
-
-```
-
-
-```sql
-
-```
-
-
-```sql
-
-```
-
-
-```sql
-
-```
 
 
 #### FULL JOIN
 
-```sql
-
-```
-
-
-```sql
-
-```
-
-
-```sql
-
-```
-
-
-```sql
-
-```
 
 
 ----------------------------------------------------------------------------------
@@ -1060,7 +999,7 @@ null. En efecte, si executem:
 
 obtenim:
 
-```
+```sql
                    Table "public.comandes"
    Column    |     Type     | Collation | Nullable | Default 
 -------------+--------------+-----------+----------+---------
@@ -1105,7 +1044,7 @@ SELECT num_comanda, empresa, rep_vendes.nom
 
 
 
-```
+```sql
  num_comanda |      empresa      |     nom     
 -------------+-------------------+-------------
       112961 | J.P. Sinclair     | Sam Clark
