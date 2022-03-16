@@ -36,7 +36,7 @@
 
 * **Configuración POSTGRESQL Debian**: [INSTALL Y CONFIGURACIÓN](https://gitlab.com/jandugar/m02-bd/-/blob/master/UF2_SQL/apunts/0_install_config_postgreSQL_DEBIAN.md)
 
-* **Instalación POSTGRESQL Debian**: [GITLAB_ANDUJAR]https://gitlab.com/jandugar/m02-bd
+* **Instalación POSTGRESQL Debian**: [GITLAB_ANDUJAR](https://gitlab.com/jandugar/m02-bd)
 
 # POSTGRESQL
 
