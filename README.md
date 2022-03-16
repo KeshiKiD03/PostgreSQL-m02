@@ -2164,6 +2164,10 @@ SELECT AVG(sal), MAX(sal), MIN(sal), SUM(sal) FROM emp WHERE Lower(job) = 'sales
 SELECT COUNT(*) FROM emp;
 ```
 
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/ways-to-count.png)
+
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/example-baby-feedings.png)
+
 * Las funciones de grupo ignoran los valores nulos.
 
 ```sql
