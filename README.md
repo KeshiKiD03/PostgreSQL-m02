@@ -10,7 +10,25 @@
 
 * **CHEATSHEET KESHI [02]**: [UNION](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-02)
 
-* **CHEATSHEET KESHI [03]**: [MultiTabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-03)
+* **CHEATSHEET KESHI [03]**: [JOIN - Multi Tabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-03)
+
+* **CHEATSHEET KESHI [04]**: [Funciones de grupo - Aggregate - GROUP BY - HAVING](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-04)
+
+* **CHEATSHEET KESHI [05]**: [UNION](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-05)
+
+* **CHEATSHEET KESHI [06]**: [JOIN - Multi Tabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-06)
+
+* **CHEATSHEET KESHI [07]**: [Consultas Simples](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-07)
+
+* **CHEATSHEET KESHI [08]**: [UNION](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-08)
+
+* **CHEATSHEET KESHI [09]**: [JOIN - Multi Tabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-09)
+
+* **CHEATSHEET KESHI [10]**: [Consultas Simples](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-10)
+
+* **CHEATSHEET KESHI [11]**: [UNION](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-11)
+
+* **CHEATSHEET KESHI [12]**: [JOIN - Multi Tabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-12)
 
 # CHEATSHEET KESHI [01]
 
