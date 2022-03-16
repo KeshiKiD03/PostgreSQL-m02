@@ -14,7 +14,7 @@
 
 * **CHEATSHEET KESHI [04]**: [Funciones de grupo - Aggregate - GROUP BY - HAVING](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-04)
 
-* **CHEATSHEET KESHI [05]**: [UNION](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-05)
+* **CHEATSHEET KESHI [05]**: [Subconsultas - ANY - ALL - IN - NOT IN](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-05)
 
 * **CHEATSHEET KESHI [06]**: [JOIN - Multi Tabla](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-06)
 
