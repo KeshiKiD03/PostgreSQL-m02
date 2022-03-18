@@ -20,7 +20,7 @@ Crear una base de dades anomenada "biblioteca". Dins aquesta base de dades:
 
 Creem la base de dades (des de qualsevol altre):
 
-```
+```SQL
 CREATE DATABASE biblioteca;
 ```
 
