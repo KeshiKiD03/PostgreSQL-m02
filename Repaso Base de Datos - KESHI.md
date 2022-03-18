@@ -54,7 +54,7 @@ AEA08 Transferència de Dades 						12
 
 * apt-get update
 
-* # apt-get install  postgresql postgresql-contrib
+* apt-get install  postgresql postgresql-contrib
 
 * dpkg -l | grep postgres
 
@@ -156,7 +156,7 @@ AEA08 Transferència de Dades 						12
 
 * # exit
 
-$ firefox /usr/share/doc/postgresql-doc-13/html/index.html &
+- $ firefox /usr/share/doc/postgresql-doc-13/html/index.html &
 
 
 ---------
