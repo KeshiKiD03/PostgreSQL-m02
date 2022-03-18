@@ -414,7 +414,7 @@ training=> exit
 
 ```
 $ psql training
-training=> GRANT UPDATE ON productes TO almacen;
+training=> GRANT UPDATE (exist) ON productes TO almacen;
 ```
 
 **Provem l'accés a l'usuari ``almacen`` a la BD training**
