@@ -5847,12 +5847,12 @@ VALUES ( 666, 'M. Rajoy', 68, 22, 'Representant Vendes',
 
 * Se pueden añadir con la sentencia INSERT, mediante una subconsulta.
 
---
+```SQL
 INSERT INTO directors(id, nom, carrec)
 SELECT num_empl, nom, carrec
 FROM rep_vendes
 WHERE carrec = 'Dir Vendes';
---
+```
 
 * Ha de coincidir el número de columnas de la clausula INSERT con la de la subconsulta.
 
@@ -5946,7 +5946,7 @@ is not present in table "oficines".
 
 * Esto es porque no existe ninguna oficina 91 en la tabla OFICINES.
 
-![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml12.png)
+
 
 ---------------------------------------------------------------------------------
 
@@ -5958,8 +5958,9 @@ is not present in table "oficines".
 
 * Se usa la clausula WHERE, para especificar.
 
-
 ![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml13.png)
+
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml14.png)
 
 ⭐️ **SINTAXIS** ⭐️
 -------------------
@@ -5969,7 +5970,7 @@ DELETE FROM taula
 ```
 -------------------
 
-![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml14.png)
+
 
 ⭐️ **EJEMPLOS** ⭐️
 -------------------
@@ -5989,6 +5990,7 @@ DELETE FROM comandes;
 **DELETE 30** 
 
 ![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml15.png)
+
 
 --------------------------------------
 
@@ -6012,6 +6014,7 @@ DELETE FROM rep_vendes
 
 ![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml17.png)
 
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml18.png)
 
 --------------------------------------
 
@@ -6032,7 +6035,8 @@ DETAIL: Key (num_empl)=(105) is still referenced
 from table "clients"
 ```
 
-![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml18.png)
+
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml19.png)
 
 * Al intentar eliminar un vendedor de la tabla rep_vendes --> ERROR DE INTEGRIDAD REFERENCIAL.
 
