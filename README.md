@@ -5642,6 +5642,7 @@ condicions, la de l'oficina sense director, en una expressió composta per AND's
 
 
 
+
 ---------------------------------------------------------------------------------
 
 

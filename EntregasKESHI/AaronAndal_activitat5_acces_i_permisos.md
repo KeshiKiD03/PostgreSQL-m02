@@ -272,12 +272,12 @@ Explica com comprovar el correcte funcionament.
 
 **En el servidor d'Aaron:**
 
-**Fitxer pg_hba.conf:**
+**Fitxer `pg_hba.conf:`**
 ```
 host    all        semiadmin        10.200.244.0/24    md5
 ```
 
-**Fitxer postgresql.conf:**
+**Fitxer `postgresql.conf:`**
 ```
 listen_addresses='*'
 ```
@@ -414,7 +414,7 @@ training=> exit
 
 ```
 $ psql training
-training=> GRANT UPDATE (exist) ON productes TO almacen;
+training=> GRANT UPDATE ON productes TO almacen;
 ```
 
 **Provem l'accés a l'usuari ``almacen`` a la BD training**
@@ -525,7 +525,7 @@ training=> GRANT SELECT ON ALL TABLES IN SCHEMA public TO lectura;
 ```
 $ psql -h 127.0.0.1 -U lectura training
 training=> SELECT *
-             FROM oficina;
+             FROM oficines;
  oficina  |   ciutat    | regio | director | objectiu  |  vendes
 ---------+-------------+--------+----------+-----------+-----------
       22 | Denver      | Oest  |      107 | 300000.00 | 186042.00
@@ -539,7 +539,7 @@ training=> SELECT *
 **Fem un update per veure que no tenim permís de ``MODIFCACIÓ CRUD``**
 
 ```
-training=> UPDATE oficina
+training=> UPDATE oficines
              SET objectiu = 50000;
 ERROR:  permission denied for table objectiu
 ```
@@ -547,9 +547,9 @@ ERROR:  permission denied for table objectiu
 **``Esmentada abans``**
 
 ```
-training=> INSERT INTO oficina (oficina, ciutat, regio)
+training=> INSERT INTO oficines (oficina, ciutat, regio)
            VALUES (111,'sdfaa','sfasd ')
-ERROR:  permission denied for table oficina
+ERROR:  permission denied for table oficines
 ```
 
 ## Exercici 10
@@ -577,16 +577,28 @@ su postgres
 $ psql training
 training=> CREATE USER gestor PASSWORD 'gestorpw';
 CREATE ROLE
+```
+```
 training=> ALTER TABLE clients OWNER TO training_group;
 ALTER TABLE
+```
+```
 training=> ALTER TABLE repvendes OWNER TO training_group;
 ALTER TABLE
+```
+```
 training=> ALTER TABLE comandes OWNER TO training_group;
 ALTER TABLE
+```
+```
 training=> ALTER TABLE productes OWNER TO training_group;
 ALTER TABLE
-training=> ALTER TABLE oficina OWNER TO training_group;
+```
+```
+training=> ALTER TABLE oficines OWNER TO training_group;
 ALTER TABLE
+```
+```
 training=> GRANT training_group TO isx36579183, gestor;
 GRANT ROLE
 ```
@@ -596,7 +608,7 @@ GRANT ROLE
 ```
 $ psql training
 training=> SELECT *
-             FROM oficina;
+             FROM oficines;
  oficina  |   ciutat    | regio | director | objectiu  |  vendes
 ---------+-------------+--------+----------+-----------+-----------
       22 | Denver      | Oest  |      107 | 300000.00 | 186042.00
@@ -608,7 +620,7 @@ training=> SELECT *
 
 $ psql -U gestor -h 127.0.0.1 training
 training=> SELECT *
-             FROM oficina;
+             FROM oficines;
  ofinum  |   ciudad    | region | director | objetivo  |  ventas
 ---------+-------------+--------+----------+-----------+-----------
       22 | Denver      | Oeste  |      107 | 300000.00 | 186042.00
@@ -626,22 +638,21 @@ Explica quina configuració ha de tenir el postgresql i quines sentències s'han
 Els noms assignats han de ser descriptius.
 
 Una base de dades d'una empresa de transport que te una taula per emmagatzemar els vehicles amb els següents camps:
- * Camp que identifica el vehicle.
- * Camp que indica la data de compra del vehicle.
- * Camp que indica si el vehicle està disponible o bé per algun motiu està al taller, quan s'afegeix un nou vehicle a la taula aquest
- camp ha de dir que el vehicle està disponible.
+ * Camp que `identifica` el vehicle.
+ * Camp que indica la `data de compra` del vehicle.
+ * Camp que indica si el vehicle `està disponible` o bé per algun motiu està al taller, quan s'afegeix un `nou vehicle` a la taula aquest camp ha de dir que el vehicle `està disponible`.
 
 Els usuaris guarden les seves contrasenyes al postgresql.
 
-L'usuari administrador ha de ser un superusuari del postgresql però només s'ha de poder connectar des d'un ordinador.
+L'usuari `administrador` ha de ser un superusuari del postgresql però només s'ha de poder connectar des d'un ordinador.
 
 L'usuari del taller:
- * Només ha de poder modificar dades les referents a l'estat del vehicle.
- * Només ha de poder connectar des d'un ordinador en concret.
+ * Només ha de poder `modificar dades` les referents a `l'estat del vehicle`.
+ * Només ha de poder connectar des `d'un ordinador en concret`.
 
 L'usuari de compres:
- * Ha de poder afegir vehicles a la taula dels vehicles, però no ha de poder modificar les dades referents a l'estat del vehicle.
- * Només s'ha de poder connectar des de la xarxa local.
+ * Ha de poder afegir `vehicles` a la `taula` dels vehicles, però `no` ha de poder `modificar` les dades referents a `l'estat del vehicle`.
+ * Només s'ha de poder connectar des de la `xarxa local`.
 
 Explica com comprovar el correcte funcionament.
 
@@ -662,11 +673,12 @@ transport=> CREATE TABLE vehicles (
     sale_date                DATE,
     available                BOOLEAN      DEFAULT true
 );
-```
-
-```
 
 CREATE TABLE
+```
+
+
+```
 transport=> \d
           List of relations
  Schema |   Name   | Type  |  Owner
@@ -681,7 +693,7 @@ transport=> SELECT *
 (0 rows)
 ```
 
-**Inserim alguns valors per poder-hi treballar: (En els que són true, no cal que possem el valor boolean ja que ho hem especificat a l'hora de crear la taula)**
+**Inserim alguns `valors` per poder-hi treballar: (En els que són true, no cal que possem el `valor boolean` ja que ho hem especificat a l'hora de crear la taula)**
 ```
 transport=> INSERT INTO vehicles (id_vehicle, sale_date)
             VALUES ('1245-LLL','2017-05-21');
@@ -719,8 +731,11 @@ transport=> SELECT *
 template1=> CREATE ROLE admin SUPERUSER WITH PASSWORD 'jupiter';
 CREATE ROLE
 ```
+
+**Li afegim tots els `permisos` a totes els `tables` amb `schema public` a l'usuari `admin`**
+
 ```
-template1=> GRANT ALL PRIVILEGES ON ALL TABLES in schema public TO administrator;
+template1=> GRANT ALL PRIVILEGES ON ALL TABLES in schema public TO admin;
 GRANT
 
 $ sudo psql -U admin transport;
@@ -744,9 +759,11 @@ host    transport     usuari_taller        10.200.244.227/32       md5
 host    transport     usuari_taller        0.0.0.0/0               reject
 ```
 
-**Com a usuari 'admin', fem que l'usuari de compres pugui afegir vehicles a la taula dels vehicles, però no ha de poder modificar les dades referents a l'estat del vehicle i només s'ha de poder connectar des de la xarxa local:**
+**Com a usuari '`admin`', fem que l'usuari de compres pugui `afegir vehicles` a la taula dels vehicles, però no ha de poder modificar les dades referents a `l'estat del vehicle` i només s'ha de poder connectar des de la `xarxa local`:**
 ```
 transport=> CREATE USER usuari_compres PASSWORD 'jupiter';
+```
+```
 transport=> GRANT INSERT ON vehicles TO usuari_compres;
 ```
 **Dins del fitxer pg_hba.conf**:
@@ -761,15 +778,15 @@ $ sudo psql -h 10.200.244.205 -U admin vehicles;
 ```
 $ sudo psql -h 10.200.244.205 -U admin vehicles;
 ```
-**AQUEST ORDINADOR TÉ UNA IP DIFERENT (192.168.1.1) LLAVORS... NO PODRÀ ACCEDIR PERQUÈ NO ESTÀ AMB L'ORDINADOR CORRESPONENT PERQUÈ PUGI ENTRAR.**
+**AQUEST ORDINADOR TÉ UNA IP DIFFERENT (192.168.1.1) LLAVORS... NO PODRÀ ACCEDIR PERQUÈ NO ESTÀ AMB L'ORDINADOR CORRESPONENT PERQUÈ PUGI ENTRAR.**
 ```
 $ sudo psql -h 10.200.244.205 -U usuari_compres vehicles;
 ```
-**PODRÀ ACCEDIR JA QUE LA IP EN QÜESTIÓ (10.200.244.204), ESTÀ DINS DEL RANG PER PODER ENTRAR.**
+**PODRÀ ACCEDIR JA QUE LA IP EN QÜESTIÓ (10.200.244.204), `ESTÀ DINS DEL RANG` PER PODER ENTRAR.**
 ```
 $ sudo psql -h 10.200.244.205 -U usuari_compres vehicles;
 ```
-**NO PODRÀ ACCEDIR JA QUE LA IP EN QÜESTIÓ (10.200.244.204), NO ÉS LA CORRESPONENT A LA QUE HEM POSSAT AL FITXER PG_HBA.CONF PER PODER ENTRAR.**
+**`NO PODRÀ ACCEDIR` JA QUE LA IP EN QÜESTIÓ (10.200.244.204), `NO ÉS LA CORRESPONENT` A LA QUE HEM POSSAT AL FITXER PG_HBA.CONF PER PODER ENTRAR.**
 ```
 $ sudo psql -h 10.200.244.205 -U usuari_taller vehicles;
 ```
@@ -778,17 +795,21 @@ $ sudo psql -h 10.200.244.205 -U usuari_taller vehicles;
 $ sudo psql -h 10.200.243.224 -U usuari_taller vehicles;
 ```
 
-**Comprovem els privilegis dels usuaris creats previament:**
+**Comprovem els privilegis dels usuaris creats abans:**
 ```
 transport=> SET ROLE usuari_compres;
+```
+```
 transport=> INSERT INTO vehicles (id_vehicle,sale_date)
             VALUES ('7777-MNM', '21-07-19');
 INSERT 0 1
+```
+```
 transport=> UPDATE vehicles
                SET id_vehicle=22222
 ```
 
-**DONARÀ ERROR DEGUT A QUE NOMÉS TÉ PERMISOS D'INCERSIÓ, NO POT MODIFICAR CAP DADA!!!!!!!!**
+**DONARÀ ERROR DEGUT A QUE NOMÉS TÉ PERMISOS D'INCERSIÓ, `NO POT MODIFICAR CAP DADA`!!!!!!!!**
 ```
 transport=> \q
 transport=> SET ROLE usuari_taller;
@@ -796,11 +817,11 @@ transport=> UPDATE vehicles
               SET available=false;
 UPDATE
 ```
-**PODRÀ JA QUE TE PERMISOS PER CAMBIAR EL VALOR DEL CAMP 'available'**
+**PODRÀ JA QUE `TE PERMISOS` PER CAMBIAR EL VALOR DEL CAMP `'available'`**
 ```
 transport=> UPDATE vehicles SET id_vehicle=false;
 ```
-**DONARÀ ERROR DEGUT A QUE NOMÉS TÉ PERMISOS PER MODIFICAR  LES DADES DEL CAMP 'available'**
+**`DONARÀ ERROR` DEGUT A QUE NOMÉS TÉ PERMISOS PER `MODIFICAR  LES DADES` DEL CAMP `'available'`**
 ```
 transport=> \q
 ```

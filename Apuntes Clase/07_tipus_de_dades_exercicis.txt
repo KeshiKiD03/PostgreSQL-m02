@@ -1,0 +1,52 @@
+-- --------------------------------------------
+--  Tipus de dades
+-- --------------------------------------------
+
+-- 7.1- Raona un parell d'exemples en els que creus que s'usaria el tipus
+-- de dades següents.
+--
+-- boolean
+-- character varying
+-- character
+-- date
+-- integer
+-- interval
+-- money
+-- numeric
+-- path
+-- point
+-- polygon
+-- real
+-- smallint
+-- serial
+-- text
+-- time
+-- timestamp
+-- uuid
+-- xml
+
+-- 7.2- Raona quin tipus de dades utilitzaries per emmagatzemar la següent
+-- informació. Escriu la notació SQL per declarar els camps. En cas de
+-- necessitar un tipus compost escriu la sentencia SQL necessària per a
+-- crear aquest tipus de dades.
+--
+-- Adreça MAC i adreça IPv4.
+-- Dia i hora d'una videoconferència intercontinental.
+-- Si hi ha o no televisió en una habitació d'hotel.
+-- Dos números de telèfon, un de la feina, un de particular.
+-- Lletra i duració d'una cançó.
+-- Recorregut d'una carretera.
+-- Cobertura d'un radar meteorològic.
+-- Data d'un aniversari.
+-- Despesa d'un viatge de negocis.
+-- Matrícula de cotxe.
+-- Illa de cases en un mapa.
+-- Localització i alçada del pic d'una muntanya.
+-- Identificador de xarxa IPv6.
+-- Hora del dia en que s'ha de realitzar una tasca.
+-- Document Nacional d'Identitat.
+-- Nombre de llits d'un Hospital.
+-- Document XHTML i URL.
+-- Nombre d'escales, de plantes i pisos d'un edifici.
+-- Abast geogràfic d'un mapa.
+-- Segons durant els que un semàfor està en verd, vermell i ambre.
