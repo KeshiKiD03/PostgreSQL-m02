@@ -5829,12 +5829,12 @@ VALUES (666, 'M. Rajoy', 68, 22, 'Representant Vendes', CURRENT_DATE, 104, 30000
 
 * Función TO_DATE(text, format) convierte una **cadena** en una fecha en **segundos**, según el formato que se le pase.
 
---
+```SQL
 INSERT INTO rep_vendes
 VALUES ( 666, 'M. Rajoy', 68, 22, 'Representant Vendes',
 	TO_DATE('1988-10-14', 'YYYY-MM-DD'), 104,
 	300000, 88888 );
---
+```
 
 -----------------------------------------------------------------------------------
 
