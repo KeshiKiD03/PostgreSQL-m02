@@ -5765,13 +5765,13 @@ condicions, la de l'oficina sense director, en una expressió composta per AND's
 
 # DML - INSERT, UPDATE, DELETE
 
-![hola](dml.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml.png)
 
-![hola](dql.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dql.png)
 
 ## INSERT
 
-![hola](dml0.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml0.png)
 
 * Permite insertar filas a una tabla
 
@@ -5789,9 +5789,9 @@ VALUES (lista de valores separados por coma);
 -----------------------------------------------------------------------------------
 
 
-![hola](dml1.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml1.png)
 
-![hola](dml2.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml2.png)
 
 ⭐️ **EJEMPLOS** ⭐️
 -----------------------------------------------------------------------------------
@@ -5813,9 +5813,9 @@ VALUES (66, 'Barcelona', 'Sud', 111, 0);
 ```
 
 
-![hola](dml3.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml3.png)
 
-![hola](dml4.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml4.png)
 
 -----------------------------------------------------------------------------------
 
@@ -5838,10 +5838,9 @@ VALUES ( 666, 'M. Rajoy', 68, 22, 'Representant Vendes',
 
 -----------------------------------------------------------------------------------
 
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml5.png)
 
-![hola](dml5.png)
-
-![hola](dml6.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml6.png)
 
 
 **AÑADIR VARIAS FILAS A UNA TABLA** --> **SUBCONSULTA**
@@ -5870,7 +5869,7 @@ WHERE carrec = 'Dir Vendes';
 
 * Se usa la clausula WHERE, para especificar.
 
-![hola](dml7.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml7.png)
 
 
 ⭐️ **SINTAXIS** ⭐️
@@ -5894,7 +5893,7 @@ SET oficina_rep = 21
 WHERE num_empl = 666;
 ```
 
-![hola](dml8.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml8.png)
 
 **IMPORTANTE**
 
@@ -5908,7 +5907,7 @@ SET oficina_rep = 21;
 
 --------------------------------------
 
-![hola](dml9.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml9.png)
 
 **Uso de subconsultas con UPDATE**
 
@@ -5923,11 +5922,11 @@ UPDATE rep_vendes
 WHERE num_empl = 666;
 ```
 
-![hola](dml10.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml10.png)
 
 --------------------------------------
 
-![hola](dml11.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml11.png)
 
 **Cuidado con los errores de INTEGRIDAD**
 
@@ -5947,7 +5946,7 @@ is not present in table "oficines".
 
 * Esto es porque no existe ninguna oficina 91 en la tabla OFICINES.
 
-![hola](dml12.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml12.png)
 
 ---------------------------------------------------------------------------------
 
@@ -5960,7 +5959,7 @@ is not present in table "oficines".
 * Se usa la clausula WHERE, para especificar.
 
 
-![hola](dml13.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml13.png)
 
 ⭐️ **SINTAXIS** ⭐️
 -------------------
@@ -5970,8 +5969,7 @@ DELETE FROM taula
 ```
 -------------------
 
-![hola](dml14.png)
-
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml14.png)
 
 ⭐️ **EJEMPLOS** ⭐️
 -------------------
@@ -5990,7 +5988,7 @@ DELETE FROM comandes;
 ```
 **DELETE 30** 
 
-![hola](dml15.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml15.png)
 
 --------------------------------------
 
@@ -6010,9 +6008,9 @@ DELETE FROM rep_vendes
 
 * En una subconsulta puede retornar más de una fila. Hemos de especificar el operador multiregistro **ANY**.
 
-![hola](dml16.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml16.png)
 
-![hola](dml17.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml17.png)
 
 
 --------------------------------------
@@ -6034,13 +6032,13 @@ DETAIL: Key (num_empl)=(105) is still referenced
 from table "clients"
 ```
 
-![hola](dml18.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml18.png)
 
 * Al intentar eliminar un vendedor de la tabla rep_vendes --> ERROR DE INTEGRIDAD REFERENCIAL.
 
 * Básicamente incumple la constraint de FK a la tabla Clients. Para ello se debe eliminar primero el registro en CLIENTES y luego en REP_VENDES.
 
-![hola](dml19.png)
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/dml19.png)
 
 
 ---------------------------------------------------------------------------------
@@ -6049,7 +6047,7 @@ from table "clients"
 
 # Aaron Andal isx36579183
 
-# Borrar CK_REP_VENDES_VENDES
+## Borrar CK_REP_VENDES_VENDES
 
 ```
 training=> ALTER TABLE rep_vendes DROP CONSTRAINT ck_rep_vendes_vendes 
@@ -6065,7 +6063,7 @@ ALTER TABLE rep_vendes
 ```
 
 
-# Modificació
+## Modificació
 
 ## Exercici 1:
 
