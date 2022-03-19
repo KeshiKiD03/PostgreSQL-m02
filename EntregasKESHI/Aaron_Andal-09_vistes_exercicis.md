@@ -113,6 +113,21 @@ CREATE VIEW
 (3 rows)
 
 ```
+
+## Solución
+
+La següent vista també seria correcta però seria una vista _read-only_:
+
+```sql
+CREATE VIEW rep_oest
+    AS SELECT rep_vendes.*
+         FROM rep_vendes
+              JOIN oficines
+                ON oficina_rep = oficina
+        WHERE regio = 'Oest';
+```
+
+Perquè seria una vista només _read-only_? Abans de mirar la solució al final dels exercicis, pensa-ho una mica.
 	
 
 ## Exercici 3
@@ -150,6 +165,26 @@ CREATE VIEW
 
 ```
 
+## Solución
+
+PostgreSQL (i altres SGBDR) permet crear vistes temporals, però aquesta
+característica no pertany ni tan sols a les _features_ opcionals de SQL
+estàndard (a diferència de les taules temporals).
+
+```sql
+CREATE TEMP VIEW comandes_sue
+    AS SELECT * 
+         FROM comandes
+        WHERE clie IN 
+              (SELECT num_clie 
+                 FROM clients 
+                WHERE rep_clie IN
+                      (SELECT num_empl 
+                         FROM rep_vendes 
+                        WHERE nom LIKE 'Sue%'));
+```
+
+
 ## Exercici 4
 
 Crea una vista de nom "clientes_vip" mostri únicament aquells clients que la
@@ -174,6 +209,29 @@ training=*> SELECT * FROM clients_vip;
 (4 rows)
 ```
 
+## Solución
+
+```sql
+CREATE VIEW clients_vip
+    AS SELECT *
+         FROM clients 
+        WHERE num_clie IN
+              (SELECT clie 
+                 FROM comandes 
+                GROUP BY clie 
+               HAVING SUM(import) > 30000);
+```
+
+```sql
+CREATE VIEW clients_vip
+    AS SELECT * 
+         FROM clients 
+        WHERE 30000 <
+             (SELECT SUM(import) 
+                FROM comandes 
+               WHERE clie = num_clie);
+```
+
 
 ## Exercici 5
 
@@ -185,6 +243,7 @@ training=*> CREATE VIEW info_rep
                     AS SELECT num_empl, nom, oficina_rep
                          FROM rep_vendes;
 CREATE VIEW
+
 training=*> SELECT * FROM info_rep;
  num_empl |      nom      | oficina_rep
 ----------+---------------+-------------
@@ -201,6 +260,15 @@ training=*> SELECT * FROM info_rep;
 (10 rows)
 ```
 
+## Solución
+
+```sql
+CREATE VIEW info_rep
+    AS SELECT num_empl, nom, oficina_rep
+         FROM rep_vendes;
+```
+
+
 ## Exercici 6
 
 Crear una vista de nom "info_oficina" que mostri les oficines amb
@@ -211,6 +279,7 @@ training=*> CREATE VIEW info_oficina
                     AS SELECT oficina, ciutat, regio
                          FROM oficines;
 CREATE VIEW
+
 training=*> SELECT * FROM info_oficina;
  oficina |   ciutat    | regio
 ---------+-------------+-------
@@ -220,6 +289,14 @@ training=*> SELECT * FROM info_oficina;
       13 | Atlanta     | Est
       21 | Los Angeles | Oest
 (5 rows)
+```
+
+## Solución
+
+```sql
+CREATE VIEW info_oficina
+    AS SELECT oficina, ciutat, regio
+         FROM oficines;
 ```
 
 ## Exercici 7
@@ -240,6 +317,14 @@ training=*> SELECT * FROM info_clie;
  Acme Mfg.         |      105
 ...
 (21 rows)
+```
+
+## Solución
+
+```sql
+CREATE VIEW info_clie
+    AS SELECT empresa, rep_clie
+         FROM clients;
 ```
 
 ## Exercici 8
@@ -263,6 +348,19 @@ training=*> SELECT * FROM clie_bill;
      2122 | Three-Way Lines |     30000.00
 (2 rows)
 ```
+
+```sql
+CREATE VIEW clie_bill
+    AS SELECT num_clie, empresa, limit_credit
+         FROM clients 
+        WHERE rep_clie IN
+              (SELECT num_empl 
+                 FROM rep_vendes 
+                WHERE nom = 'Bill Adams');
+```
+
+## Solución
+
 
 ## Exercici 9
 
@@ -294,6 +392,22 @@ training=*> SELECT * FROM comanda_per_rep;
                     110 |                 2 |     23132.00 |       632.00 |     22500.00 | 11566.0000000000000000
 (9 rows)
 ```
+
+## Solución
+
+```sql
+CREATE VIEW ped_por_rep
+    AS SELECT rep AS id_representant_vendes, 
+              COUNT(*) AS quantitat_comandes, 
+              SUM(import) AS import_total, 
+              MIN(import) AS import_minim, 
+              MAX(import) AS import_maxim, 
+              ROUND(AVG(import), 2) AS import_promig
+         FROM comandes
+        WHERE rep IS NOT NULL 
+        GROUP BY rep;
+```
+
 
 ## Exercici 10
 
@@ -327,6 +441,19 @@ training=*> SELECT * FROM top_rep;
 (9 rows)
 ```
 
+## Solución
+
+```sql
+CREATE VIEW top_rep
+    AS SELECT nom, quantitat_comandes, import_total, import_promig
+         FROM ped_por_rep
+              JOIN rep_vendes
+              ON id_representant_vendes = num_empl
+        ORDER BY import_maxim DESC;
+```
+
+
+
 ## Exercici 11
 
 Crear una vista de nom "info_comanda" amb les dades de les comandes però amb
@@ -352,6 +479,20 @@ training=*> SELECT * FROM info_comanda ;
 
 ...
 (30 rows)
+```
+
+## Solución
+
+```sql
+CREATE VIEW info_comanda
+    AS SELECT num_comanda, data, empresa, nom,
+              fabricant, producte, quantitat, import
+         FROM comandes
+              JOIN clients
+              ON clie = num_clie
+    
+              JOIN rep_vendes
+              ON rep = num_empl;
 ```
 
 ## Exercici 12
@@ -390,13 +531,23 @@ training=*> SELECT * FROM clie_rep;
 (18 rows)
 ```
 
+## Solución
+
+```sql
+CREATE VIEW clie_rep
+    AS SELECT empresa, nom, SUM(import) 
+         FROM info_comanda 
+        GROUP BY empresa, nom;
+```
+
+
 ## Exercici 13
 
 Crear una vista temporal per substituir la taula "comandes" que mostri les
 comandes amb import més gran a 20000 i ordenades per import de forma
 descendent.
 
-```
+```sql
 training=*> CREATE LOCAL TEMPORARY VIEW comandes_v2
                                     AS SELECT *
                                          FROM comandes
@@ -415,13 +566,24 @@ training=*# SELECT * FROM comandes_v2;
 (6 rows)
 ```
 
+## Solución
+
+```sql
+CREATE TEMP VIEW comandes
+    AS SELECT * 
+         FROM comandes
+        WHERE import > 20000 
+        ORDER BY import DESC;
+```
+
+
 ## Exercici 14
 
 Crea una vista anomenada "top_clie" que mostri el nom de l'empresa client i el
 total dels imports de les comandes del client. S'han d'ordenar per tal que
 primer es mostrin els que tenen major import total.
 
-```
+```sql
 training=*> CREATE VIEW top_clie
                      AS SELECT nom_client, SUM(import)
                           FROM info_comanda
@@ -450,6 +612,17 @@ training=*> SELECT * FROM top_clie;
 (15 rows)
 ```
 
+## Solución
+
+```sql
+CREATE VIEW top_clie
+    AS SELECT empresa, SUM(import) 
+         FROM info_comanda 
+        GROUP BY empresa 
+        ORDER BY SUM(import) DESC;
+```
+
+
 ## Exercici 15
 
 Crea una vista anomenata "top_prod" que mostri les dades de tots els productes
@@ -457,7 +630,7 @@ seguit d'un camp anomenat "quant_total" en que es mostri la quantitat de cada
 producte que s'ha demanat en totes les comandes. S'ha d'ordenar per tal que
 primer es mostrin els productes que tenen més comandes.
 
-```
+```sql
 training=*> CREATE VIEW top_prod
                     AS SELECT p.*, SUM(quantitat)
                          FROM productes p
@@ -491,6 +664,19 @@ training=*> SELECT * FROM top_prod;
 (17 rows)
 ```
     
+## Solución
+
+```sql
+CREATE VIEW top_prod
+    AS SELECT productes.*, SUM(quantitat)
+         FROM productes
+              JOIN comandes
+              ON (id_fabricant, id_producte) = (fabricant, producte)
+        GROUP BY id_fabricant, id_producte
+        ORDER BY COUNT(*) DESC;
+``` 
+
+
 
 ## Exercici 16
 
@@ -503,7 +689,7 @@ representant de vendes tingui cap. També ha de mostrar un camp anomenat
 el representant de vendes, en cas que el representant de vendes tingui
 assignada una oficina aquesta tingui un director.
 
-```
+```sql
 training=*> CREATE VIEW responsables
                     AS SELECT empl.nom AS empl, jefe.nom AS jefe,
                               dir_emp.nom AS dir_emp
@@ -530,3 +716,28 @@ training=*> SELECT * FROM responsables;
  Nancy Angelli | Larry Fitch | Larry Fitch
 (10 rows)
 ```
+
+## Solución
+
+```sql
+CREATE VIEW responsables
+    AS SELECT empleats.nom AS empl, caps.nom AS superior, directors.nom AS ofi_dire 
+         FROM rep_vendes empleats 
+              LEFT JOIN rep_vendes caps
+              ON empleats.cap = caps.num_empl 
+              
+              LEFT JOIN oficines
+              ON empleats.oficina_rep = oficina 
+
+              LEFT JOIN rep_vendes directors
+              ON director = directors.num_empl;
+```
+
+## Extres
+
++ Exercici2: recordem que a PostreSQL tenim la limitació de les vistes actualitzables (tot i que se li podria donar una volta amb les RULES, fora del temari), per exemple una consulta multitaula no ho serà, ni una agrupada ... Al manual d'ajuda de PostgreSQL tenim:
+
+	- The view must have exactly one entry in its FROM list, which must be a table or another updatable view.
+	- The view definition must not contain WITH, DISTINCT, GROUP BY, HAVING, LIMIT, or OFFSET clauses at the top level.
+	- The view definition must not contain set operations (UNION, INTERSECT or EXCEPT) at the top level.
+	- The view's select list must not contain any aggregates, window functions or set-returning functions.
