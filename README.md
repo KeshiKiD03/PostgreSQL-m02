@@ -30,7 +30,7 @@
 
 * **CHEATSHEET KESHI [12]**: [ACCESO](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-12)
 
-* **CHEATSHEET KESHI [13]**: [DCL - PERMISOS](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-12)
+* **CHEATSHEET KESHI [13]**: [DCL - PERMISOS](https://github.com/KeshiKiD03/m02#cheatsheet-keshi-13)
 
 ## Links de Interes
 
