@@ -310,13 +310,13 @@ WHERE vendes < quota AND vendes < 300000;
 
 Identificador i nom dels venedors que treballen a les oficines 11 o 13.
 
-```
+```sql
 SELECT num_empl, nom
 FROM rep_vendes
 WHERE oficina_rep IN(11,13);
 ```
 
-```
+```sql
  num_empl |   nom   
 ----------+------------
       105 | Bill Adams
@@ -327,7 +327,7 @@ WHERE oficina_rep IN(11,13);
 
 Una altra possible solució:
 
-```
+```sql
 SELECT num_empl, nom
 FROM rep_vendes
 WHERE oficina_rep = 11 OR oficina_rep = 13;
@@ -345,7 +345,7 @@ FROM productes
 ORDER BY preu DESC;
 ```
 
-```
+```sql
  id_producte |     descripcio     |  preu   
 -------------+--------------------+---------
  2a44r       | Frontissa Dta.     | 4500.00
@@ -386,7 +386,7 @@ estoc * preu as "valor_inventari"
 FROM productes;
 ```
 
-```
+```sql
  id_producte |     descripcio     | valor_inventari 
 -------------+--------------------+-----------------
  2a45c       | V Stago Trinquet   |        16590.00
@@ -426,7 +426,7 @@ SELECT ciutat || ' té unes vendes de ' || vendes AS "Vendes de cada oficina"
 FROM  oficines;
 ```
 
-```
+```sql
          Vendes de cada oficina          
 -----------------------------------------
  Denver té unes vendes de 186042.00
@@ -445,7 +445,7 @@ Codis d'empleats que són directors d'oficines.
 SELECT DISTINCT director FROM oficines;
 ```
 
-```
+```sql
  director 
 ----------
       108
@@ -465,7 +465,7 @@ FROM oficines
 WHERE  80 * objectiu / 100 > vendes;
 ```
 
-```
+```sql
  oficina | ciutat
 ---------+--------
       22 | Denver
@@ -492,7 +492,7 @@ SELECT oficina, ciutat, director
 FROM oficines WHERE director <> 108;
 ```
 
-```
+```sql
  oficina |  ciutat  | director 
 ---------+----------+----------
       11 | New York |      106
@@ -514,7 +514,7 @@ WHERE vendes > 80 * quota / 100 AND vendes < 120 * quota / 100;
 
 El mateix d'una altra manera:
 
-```
+```sql
 SELECT num_empl,nom
 FROM rep_vendes
 WHERE (vendes/quota) BETWEEN  0.8 AND 1.20;
@@ -522,7 +522,7 @@ WHERE (vendes/quota) BETWEEN  0.8 AND 1.20;
       --AND (vendes/quota) < 1.20;
 ```
 
-```
+```sql
  num_empl |   nom    
 ----------+-------------
       105 | Bill Adams
@@ -541,7 +541,7 @@ FROM rep_vendes
 WHERE vendes > 80 * quota / 100 AND vendes < 120 * quota / 100;
 ```
 
-```
+```sql
  num_empl |     nom     |     percentatge      
 ----------+-------------+----------------------
       105 | Bill Adams  | 105.1174285714285714
@@ -560,7 +560,7 @@ FROM rep_vendes
 WHERE vendes > 80 * quota / 100 AND vendes < 120 * quota / 100;
 ```
 
-```
+```sql
  num_empl |     nom     | percentatge 
 ----------+-------------+-------------
       105 | Bill Adams  |      105.12
@@ -575,12 +575,12 @@ WHERE vendes > 80 * quota / 100 AND vendes < 120 * quota / 100;
 
 Identificador, vendes i ciutat de cada oficina ordenades alfabèticament per regió i, dintre de cada regió ordenades per ciutat.
 
-```
+```sql
 SELECT oficina, vendes, ciutat
 FROM oficines
 ORDER BY regio, ciutat;
 ```
-```
+```sql
  oficina |  vendes   |   ciutat
 ---------+-----------+-------------
       13 | 367911.00 | Atlanta
@@ -595,12 +595,12 @@ ORDER BY regio, ciutat;
 Llista d'oficines classificades alfabèticament per regió i, per cada regió, en
 ordre descendent de rendiment de vendes (vendes-objectiu).
 
-```
+```sql
 SELECT oficina,ciutat
 FROM oficines
 ORDER BY regio ASC, (vendes-objectiu) DESC;
 ```
-```
+```sql
  oficina |   ciudad
 ---------+-------------
       11 | New York
@@ -618,7 +618,7 @@ SELECT oficina,ciutat,regio, vendes - objectiu as diferencia
 FROM oficines
 ORDER BY regio ASC, (vendes-objectiu) DESC;
 ```
-```
+```sql
  oficina |   ciutat    | regio | diferencia 
 ---------+-------------+-------+------------
       11 | New York    | Est   |  117637.00
@@ -635,7 +635,7 @@ Codi i nom dels tres venedors que tinguin unes vendes superiors.
 
 Solució fent servir SQL ANSI:
 
-```
+```sql
 SELECT num_empl,nom
 FROM rep_vendes
 ORDER BY vendes DESC
@@ -644,13 +644,13 @@ FETCH FIRST 3 ROWS ONLY;
 
 [Solució de PostgreSQL (i MySQL, MAriaDB, SQLite)...](https://en.wikipedia.org/wiki/Select_(SQL)#FETCH_FIRST_clause):
 
-```
+```sql
 SELECT num_empl,nom
 FROM rep_vendes
 ORDER BY vendes DESC
 LIMIT 3;
 ```
-```
+```sql
   num_empl |   nom   
 ----------+------------
       102 | Sue Smith
@@ -662,12 +662,12 @@ LIMIT 3;
 
 Nom i data de contracte dels empleats que les seves vendes siguin superiors a 500000.
 
-```
+```sql
 SELECT nom, data_contracte
 FROM rep_vendes
 WHERE vendes > 500000;
 ```
-```
+```sql
  nom | data_contracte 
 --------+----------
 (0 rows)
@@ -679,12 +679,12 @@ Nom i quota actual dels venedors amb el calcul d'una "nova possible quota" que
 serà la quota de cada venedor augmentada un 3 per cent de les seves pròpies
 vendes.
 
-```
+```sql
 SELECT nom, quota, quota + cast(3 * vendes / 100 as numeric(8,2)) AS "nova possible quota"
 FROM rep_vendes;
 ```
 
-```
+```sql
       nom      |   quota   | nova possible quota 
 ---------------+-----------+---------------------
  Bill Adams    | 350000.00 |           361037.33
@@ -704,12 +704,12 @@ FROM rep_vendes;
 
 Numero i import de les comandes que el seu import oscil·li entre 20000 i 29999.
 
-```
+```sql
 SELECT num_comanda, import
 FROM comandes
 WHERE import BETWEEN 20000 AND 29999;
 ```
-```
+```sql
  num_pedido | importe  
 ------------+----------
      110036 | 22500.00
@@ -722,20 +722,20 @@ WHERE import BETWEEN 20000 AND 29999;
 
 Nom, vendes i quota dels venedors, les vendes dels quals no estiguin entre el 80% i el 120% de la seva quota.
 
-```
+```sql
 SELECT nom, vendes, quota
 FROM rep_vendes
 WHERE vendes > 120 * quota / 100 OR vendes < 80 * quota / 100;
 ```
 o també
 
-```
+```sql
 SELECT nom, vendes, quota
 FROM rep_vendes
 WHERE vendes NOT BETWEEN (80 * quota / 100) AND (120* quota / 100);
 ```
 
-```
+```sql
       nom      |  vendes   |   quota   
 ---------------+-----------+-----------
  Mary Jones    | 392725.00 | 300000.00
@@ -749,13 +749,13 @@ WHERE vendes NOT BETWEEN (80 * quota / 100) AND (120* quota / 100);
 
 Nom i límit de crèdit de les empreses, el nom de les quals comencin per Smith.
 
-```
+```sql
 SELECT empresa, limit_credit
 FROM clients
 WHERE empresa LIKE 'Smith%';
 ```
 
-```
+```sql
     empresa     | limit_credit 
 ----------------+--------------
  Smithson Corp. |     20000.00
@@ -766,12 +766,12 @@ WHERE empresa LIKE 'Smith%';
 
 Identificador i nom dels venedors que no tenen assignada oficina.
 
-```
+```sql
 SELECT num_empl,nom
 FROM rep_vendes
 WHERE oficina_rep IS NULL;
 ```
-```
+```sql
  num_empl |    nom     
 ----------+------------
       110 | Tom Snyder
@@ -783,13 +783,13 @@ WHERE oficina_rep IS NULL;
 
 Identificador i nom dels venedors, amb l'identificador de l'oficina, d'aquells venedors que tenen una oficina assignada.
 
-```
+```sql
 SELECT num_empl,nom,oficina_rep
 FROM rep_vendes
 WHERE oficina_rep IS NOT NULL;
 ```
 
-```
+```sql
  num_empl |     nom       | oficina_rep 
 ----------+---------------+-------------
       105 | Bill Adams    |          13
@@ -810,13 +810,13 @@ Identificador i descripció dels productes del fabricant identificat per _imm_
 dels quals hi hagi estoc superior o igual a 200, també del fabricant _bic_
 amb estoc superior o igual a 50.
 
-```
+```sql
 SELECT id_fabricant, id_producte, descripcio  FROM productes
 WHERE id_fabricant = 'imm' AND existencias >= 200
 OR id_fabricant = 'bic' AND existencias >= 50;
 ```
 
-```
+```sql
  id_fabricant | id_producte |  descripcio   
 --------------+-------------+---------------
  imm          | 887h        | Suport Riosta
@@ -832,7 +832,7 @@ compleixen algun dels següents supòsits:
 + han estat contractats a partir de juny del 1988 i no tenen cap
 + estan per sobre la quota però tenen vendes de 600000 o menors.
 
-```
+```sql
 SELECT num_empl, nom, oficina_rep, data_contracte, cap, quota, vendes
 FROM rep_vendes
 WHERE oficina_rep IN(22,11,12)
@@ -841,7 +841,7 @@ OR
 vendes > quota AND vendes <= 600000);
 ```
 
-```
+```sql
  num_empl |     nom     | oficina_rep | data_contracte | cap |   quota   |  vendes   
 ----------+-------------+-------------+----------------+-----+-----------+-----------
       109 | Mary Jones  |          11 | 1989-10-12     | 106 | 300000.00 | 392725.00
@@ -856,13 +856,13 @@ vendes > quota AND vendes <= 600000);
 Identificador i descripció dels productes amb un preu superior a 1000 i que
 siguin del fabricant amb identificador _rei_ o estoc superior a 20.
 
-```
+```sql
 SELECT id_producte, descripcio
 FROM productes
 WHERE preu > 1000 AND ( id_fabricant = 'rei' OR estoc > 20 );
 ```
 
-```
+```sql
  id_producte |   descripcio   
 -------------+----------------
  4100y       | Extractor
@@ -878,12 +878,12 @@ Identificador del fabricant, identificador del producte i descripció d'aquells
 productes amb identificador de fabricant format per una lletra qualsevol, una
 lletra 'i' i una altre lletra qualsevol.
 
-```
+```sql
 SELECT id_fabricant, id_producte, descripcio
 FROM productes WHERE id_fabricant LIKE '_i_';
 ```
 
-```
+```sql
  id_fabricant | id_producte | descripcio 
 --------------+-------------+------------
  bic          | 41672       | Plate
@@ -897,7 +897,7 @@ FROM productes WHERE id_fabricant LIKE '_i_';
 Identificador i descripció dels productes la descripció dels quals comença per
 _art_ sense tenir en compte les majúscules i minúscules.
 
-```
+```sql
 SELECT id_producte, descripcio
 FROM productes
 WHERE descripcio ILIKE 'art%';
@@ -905,7 +905,7 @@ WHERE descripcio ILIKE 'art%';
 
 ILIKE és un operador que es fa servir a PostgreSQL
 
-```
+```sql
  id_producte |   descripcio   
 -------------+-----------------
  41003       | Articulo Tipo 3 
@@ -920,13 +920,13 @@ ILIKE és un operador que es fa servir a PostgreSQL
 Identificador i nom dels clients que la segona lletra del nom sigui una "a"
 minúscula o majuscula.
 
-```
+```sql
 SELECT num_clie, empresa
 FROM clients
 WHERE empresa ILIKE '_a%';
 ```
 
-```
+```sql
  num_clie |     empresa     
 ----------+-----------------
      2123 | Carter & Sons
@@ -938,17 +938,19 @@ WHERE empresa ILIKE '_a%';
 ## Exercici 38:
 
 Identificador i ciutat de les oficines que compleixen algun dels següents supòsits:
+
 + És de la regió est amb unes vendes inferiors a 700000.
+
 + És de la regió oest amb unes vendes inferiors a 600000.
 
-```
+```sql
 SELECT oficina,ciutat
 FROM oficines
 WHERE regio = 'Est' AND vendes < 700000
 OR regio = 'Oest' AND vendes < 600000;
 ```
 
-```
+```sql
  oficina |  ciutat  
 ---------+----------
       22 | Denver
@@ -960,17 +962,19 @@ OR regio = 'Oest' AND vendes < 600000;
 ## Exercici 39:
 
 Identificador del fabricant i producte, descripció d'aquells productes que compleixen tots els següents supòsits:
+
 + L'identificador del fabricant és "imm" o el preu és menor a 500.
+
 + L'estoc és inferior a 5 o el producte te l'identificador _41003_.  
 
-```
+```sql
 SELECT id_fabricant, id_producte, descripcio
 FROM productes
 WHERE (id_fabricant = 'imm' OR preu < 500)
 AND (estoc < 5 OR id_producte = '41003');
 ```
 
-```
+```sql
  id_fabricant | id_producte |   descripcio    
 --------------+-------------+-----------------
  bic          | 41672       | Plate
@@ -984,13 +988,13 @@ Identificador de les comandes del fabricant, l'identificador del qual és _rei_
 amb una quantitat superior o igual a 10 o amb un import superior o igual a
 10000.
 
-```
+```sql
 SELECT num_comanda
 FROM comandes
 WHERE fabricant = 'rei' AND (quantitat >= 10 OR import >= 10000);
 ```
 
-```
+```sql
  num_comanda 
 -------------
       112961
@@ -1005,12 +1009,12 @@ WHERE fabricant = 'rei' AND (quantitat >= 10 OR import >= 10000);
 Data de les comandes amb una quantitat superior a 20 i un import superior a
 1000 dels clients 2102, 2106 i 2109.
 
-```
+```sql
 SELECT data
 FROM comandes
 WHERE quantitat > 20 AND import > 1000 AND clie IN(2102,2106,2109);
 ```
-```
+```sql
     data    
 ------------
  1989-10-12
@@ -1023,12 +1027,12 @@ WHERE quantitat > 20 AND import > 1000 AND clie IN(2102,2106,2109);
 Identificador dels clients el nom dels quals no conté ' Corp.' o ' Inc.' amb
 crèdit major a 30000.
 
-```
+```sql
 SELECT num_clie
 FROM clients
 WHERE empresa NOT LIKE '% Corp.' AND empresa NOT LIKE '% Inc.' AND limit_credit > 50000;
 ```
-```
+```sql
  num_clie 
 ----------
      2101
@@ -1042,13 +1046,13 @@ WHERE empresa NOT LIKE '% Corp.' AND empresa NOT LIKE '% Inc.' AND limit_credit 
 Identificador dels representants de vendes majors de 40 anys amb vendes
 inferiors a 400000.
 
-```
+```sql
 SELECT num_empl
 FROM rep_vendes
 WHERE edat > 40 AND vendes < 400000;
 ```
 
-```
+```sql
 num_empl
 ----------
       106
@@ -1064,15 +1068,17 @@ num_empl
 Identificador dels representants de vendes menors de 35 anys amb vendes
 superiors a 350000.
 
-```
+```sql
 SELECT num_empl
 FROM rep_vendes
 WHERE edat < 35 AND vendes > 350000;
 ```
 
-```
+```sql
 num_empl
 ----------
       109
 (1 row)
 ```
+
+----------------------------------------------------------------------------------
