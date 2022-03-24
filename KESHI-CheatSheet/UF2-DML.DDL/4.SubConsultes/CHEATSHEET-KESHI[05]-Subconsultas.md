@@ -53,7 +53,7 @@ Larry Fitch
 
 ![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/subconmono0.png)
 
-![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/subconmono1.png
+![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/subconmono1.png)
 
 ![hola](https://github.com/KeshiKiD03/m02/blob/main/Photos/subconmono2.png)
 
