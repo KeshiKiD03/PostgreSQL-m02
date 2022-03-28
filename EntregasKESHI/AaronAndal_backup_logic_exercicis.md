@@ -211,29 +211,356 @@ training_bkp4.sql: ASCII text
 
 Fes una còpia de seguretat lògica només de la taula _comandes_ de tipus script SQL.
 
+```yaml
+pg_dump --help | grep "\-t, "
+  -t, --table=PATTERN          dump the specified table(s) only
+```
 
+```yaml
+pg_dump --dbname=training -t comandes --username=isx36579183 --format=plain --file=training_bkp5.sql
+```
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ ls -la
+total 76
+drwxr-xr-x  3 isx36579183 hisx2  4096 Mar 25 08:40 .
+drwx--x--x 21 isx36579183 hisx2  4096 Mar 25 08:34 ..
+drwxr-xr-x  2 isx36579183 hisx2  4096 Mar 25 08:18 backups
+-rw-r--r--  1 isx36579183 hisx2 26112 Mar 25 08:28 training_bkp2.tar
+-rw-r--r--  1 isx36579183 hisx2  4425 Mar 25 08:31 training_bkp3.tar.gz
+-rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp4.sql
+-rw-r--r--  1 isx36579183 hisx2  3289 Mar 25 08:40 training_bkp5.sql
+-rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp.sql
+```
 
 ## Pregunta 8
 
-Fes una còpia de seguretat lògica només de la taula _rep_vendes_ de tipus binari.
+Fes una còpia de seguretat lògica només de la taula `_rep_vendes_` de `tipus binari`.
 
-## Pregunta 9 
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_dump --dbname=training -t rep_vendes --username=isx36579183 --format=custom --file=training_bkp6.bin
+```
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ ls -la
+total 80
+drwxr-xr-x  3 isx36579183 hisx2  4096 Mar 25 08:52 .
+drwx--x--x 21 isx36579183 hisx2  4096 Mar 25 08:34 ..
+drwxr-xr-x  2 isx36579183 hisx2  4096 Mar 25 08:18 backups
+-rw-r--r--  1 isx36579183 hisx2 26112 Mar 25 08:28 training_bkp2.tar
+-rw-r--r--  1 isx36579183 hisx2  4425 Mar 25 08:31 training_bkp3.tar.gz
+-rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp4.sql
+-rw-r--r--  1 isx36579183 hisx2  3289 Mar 25 08:42 training_bkp5.sql
+-rw-r--r--  1 isx36579183 hisx2  3330 Mar 25 08:51 training_bkp6.bin
+-rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp.sql
+
+```
+
+## Pregunta 9
 
 Elimina la taula _comandes_ de la base de dades _training_.
 
+Quina ordre restaura la taula *comandes*:
+
 ```sql
-DROP TABLE comandes FROM training;
+training=> \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
 ```
+
+```sql
+training=> DROP TABLE comandes;
+DROP TABLE
+```
+```sql
+training=> \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(4 rows)
+```
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ psql --dbname=training --username=isx36579183 < training_bkp5.sql
+
+training=# \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
+```
+
 ## Pregunta 10
 
-Elimina la taula *rep_vendes* de la base de dades training. 
+Fes un cop d'ull al backup tar creat a l'exercici 3 (per exemple amb l'ordre `tar xvf` ). 
 
-Quina ordre restaura la taula *rep_vendes* (recorda que el fitxer és binari)
+Creus que a partir d'aquest fitxer es `podria restaurar` només una taula? 
+
+Si és així, escriu i comprova-ho amb rep_vendes (abans hauràs d'eliminar la taula amb `DROP`)
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ tar xvf training_bkp2.tar
+toc.dat
+3020.dat
+3021.dat
+3018.dat
+3017.dat
+3019.dat
+restore.sql
+```
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ ls -la \*.dat restore\*
+-rw------- 1 isx36579183 hisx2  821 Mar 25 08:28 3017.dat
+-rw------- 1 isx36579183 hisx2  206 Mar 25 08:28 3018.dat
+-rw------- 1 isx36579183 hisx2  729 Mar 25 08:28 3019.dat
+-rw------- 1 isx36579183 hisx2  671 Mar 25 08:28 3020.dat
+-rw------- 1 isx36579183 hisx2 1427 Mar 25 08:28 3021.dat
+-rw------- 1 isx36579183 hisx2 7328 Mar 25 08:28 restore.sql
+-rw------- 1 isx36579183 hisx2 8266 Mar 25 08:28 toc.dat
+
+training=# \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
+```
+
+```sql
+training=# DROP TABLE rep_vendes CASCADE;
+NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to constraint fk_clients_rep_clie on table clients
+drop cascades to constraint fk_comandes_rep on table comandes
+drop cascades to constraint fk_oficina_director on table oficines
+DROP TABLE
+
+training=# \d
+            List of relations
+ Schema |   Name    | Type  |    Owner
+--------+-----------+-------+-------------
+ public | clients   | table | isx36579183
+ public | comandes  | table | isx36579183
+ public | oficines  | table | isx36579183
+ public | productes | table | isx36579183
+(4 rows)
+```
+
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -d training -Ft -t rep_vendes < fitxer.tar
+
+training=# \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
+```
 
 ## Pregunta 11
 
-Després de fer una còpia de tota la base de dades training en format binari, elimina-la. 
+Elimina la taula *rep_vendes* de la base de dades training.
+
+Quina ordre restaura la taula *rep_vendes* (recorda que el fitxer és binari)
+
+```yaml
+training=# \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
+```
+
+```sql
+training=# DROP TABLE rep_vendes CASCADE;
+NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to constraint fk_clients_rep_clie on table clients
+drop cascades to constraint fk_oficina_director on table oficines
+drop cascades to constraint fk_comandes_rep on table comandes
+DROP TABLE
+
+training=# \d
+            List of relations
+ Schema |   Name    | Type  |    Owner
+--------+-----------+-------+-------------
+ public | clients   | table | isx36579183
+ public | comandes  | table | isx36579183
+ public | oficines  | table | isx36579183
+ public | productes | table | isx36579183
+(4 rows)
+```
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -Fc -d training training_bkp6.bin
+
+training=# \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
+```
+
+## Pregunta 12
+
+Després de fer una `còpia` de tota la base de dades training en format binari, elimina-la.
 
 Hi ha l'ordre de bash `dropdb` (en realitat és un wrapper de DROP DATABASE). I de manera anàloga també n'hi ha l'ordre de bash `createdb`.
-Sense utilitzar aquesta última i amb una única ordre restaura la base de dades training.
 
+Sense utilitzar aquesta última i amb una única ordre restaura la base de dades `training`.
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_dump --dbname=training format=custom --file=training_bkp7.bin
+
+isx36579183@j05:~/Documents/m02/dataBases$ ls -la
+total 92
+drwxr-xr-x  3 isx36579183 hisx2  4096 Mar 25 09:08 .
+drwx--x--x 21 isx36579183 hisx2  4096 Mar 25 08:34 ..
+drwxr-xr-x  2 isx36579183 hisx2  4096 Mar 25 08:18 backups
+-rw-r--r--  1 isx36579183 hisx2 26112 Mar 25 08:28 training_bkp2.tar
+-rw-r--r--  1 isx36579183 hisx2  4425 Mar 25 08:31 training_bkp3.tar.gz
+-rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp4.sql
+-rw-r--r--  1 isx36579183 hisx2  3289 Mar 25 08:42 training_bkp5.sql
+-rw-r--r--  1 isx36579183 hisx2  3330 Mar 25 08:51 training_bkp6.bin
+-rw-r--r--  1 isx36579183 hisx2  9013 Mar 25 09:08 training_bkp7.bin
+-rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp.sql
+```
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ dropdb training
+```
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -C -f training_bkp7.bin
+
+training=# \d
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | clients    | table | isx36579183
+ public | comandes   | table | isx36579183
+ public | oficines   | table | isx36579183
+ public | productes  | table | isx36579183
+ public | rep_vendes | table | isx36579183
+(5 rows)
+```
+
+## Pregunta 13
+
+Per defecte, si n'hi ha un error quan fem la `restauració` psql `ignora` l'`error` i continuarà `executant`-se. Si volem que pari just quan hi hagi l'errada quina opció afegirem a l'ordre psql:
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -Fc -d -e training training_bkp8.bin
+
+-e (exit-on-error) --> A l'hora que envia les comandes sql, ens envía un error.
+```
+
+## Pregunta 14
+
+Si es vol que la `restauració` es faci en `mode` `transacció`, és a dir o es `fa` `tot` o `no` es `fa` `res`, com seria l'ordre?
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -aC backup.sql
+```
+
+## Pregunta 15
+
+Quina ordre em permet fer un `backup` de `totes` les `bases` de `dades` d'un `cluster`? Es necessita ser l'`administrador` de la base de dades?
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_dumpall > backup_all_db.sql
+
+Sí, requereix de permisos d'administrador.
+```
+
+## Pregunta 16
+
+Quina ordre em permet `restaurar` totes les `bases` de `dades` d'un `cluster` a partir del fitxer `backup_all_db.sql` ? Es `necessita` ser l'`administrador` de la base de dades?
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ psql < backup_all_db.sql
+
+Sí, requereix de permisos d'administrador.
+```
+
+## Pregunta 17
+
+Quina ordre em `permet` fer una còpia de `seguretat` de tipus `tar` la `base` de `dades` `training` que es troba a `192.168.0.123` ? Canvia la IP per la de l'ordinador del teu company.
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_dump -h 10.200.244.206 -U isx36579183 -F t training > training_bkp_company.tar
+
+isx36579183@j05:~/Documents/m02/dataBases$ tar tf training_bkp_company.tar
+toc.dat
+3020.dat
+3021.dat
+3018.dat
+3017.dat
+3019.dat
+restore.sql
+```
+
+## Pregunta 18
+
+Es pot fer un backup de la base de dades `training` del `server1` i que es `restauri` on the f`ly a `server2`?
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ pg_dump -h 10.200.244.229 training > training_bkp2_company.sql || psql training < training_bkp2_company.sql
+```
+
+```yaml
+isx36579183@j05:~/Documents/m02/dataBases$ cat training_bkp2_company.sql | less
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 13.3 (Debian 13.3-1)
+-- Dumped by pg_dump version 13.4 (Debian 13.4-0+deb11u1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+...
+:
+```
