@@ -1,0 +1,17 @@
+1. Primero se hace la subconsulta y luego la consulta general.
+SELECT select_list
+FROM Tabla
+WHERE salary >
+	(SELECT salary
+	FROM	employees
+	WHERE last_name = 'Abel');
+----------------------------------------------------
+SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary < ANY
+                  (SELECT salary
+                    FROM  employees
+                    WHERE job_id = 'IT_PROG')
+                    
+AND job_id <> 'IT_PROG';
+----------------------------------------------------

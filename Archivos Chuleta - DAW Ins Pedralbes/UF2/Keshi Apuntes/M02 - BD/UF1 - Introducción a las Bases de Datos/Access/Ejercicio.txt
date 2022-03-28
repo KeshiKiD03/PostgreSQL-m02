@@ -1,0 +1,4 @@
+-Copiar la tabla caract. - comarcas
+y llamarlos MIS_COMARCAS
+-Eliminar las comarcas que tengan menos de 50.000 hab
+Y que sean de LERIDA

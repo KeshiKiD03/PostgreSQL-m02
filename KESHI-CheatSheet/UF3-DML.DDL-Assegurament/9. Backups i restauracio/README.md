@@ -124,7 +124,9 @@ còpia: cold backup i hot backup.
   IOC](https://ioc.xtec.cat/materials/FP/Recursos/fp_asx_m10_/web/fp_asx_m10_htmlindex/WebContent/u3/a4/continguts.html)
 
 
+## COMO CREAR UN SUPER USUARIO
 
+https://tableplus.com/blog/2018/10/how-to-create-superuser-in-postgresql.html 
 
 ---------------------------------------------------------------------------------
 
