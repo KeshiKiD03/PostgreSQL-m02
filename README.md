@@ -8581,7 +8581,7 @@ SELECT * FROM CLIENTS WHERE rep_clie = ANY (
 
 ```sql
 UPDATE clients SET rep_clie = 105
-WHERE rep_clie = ALL (
+WHERE rep_clie IN (
 	SELECT num_empl 
 	FROM rep_vendes 
 	WHERE vendes < (quota*0.8));
