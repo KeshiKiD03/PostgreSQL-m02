@@ -1472,6 +1472,14 @@ DELETE FROM productes
            AND DATE_PART('year', data) >= 1990);
 ```
 
+SELECT FROM productes
+ WHERE estoc = 0
+   AND NOT EXISTS
+       (SELECT * 
+          FROM comandes 
+         WHERE id_fabricant = fabricant
+           AND id_producte = producte 
+           AND DATE_PART('year', data) >= 1990);
 
 * Afegiu una oficina de la ciutat de "San Francisco", regió oest, el cap ha de ser "Larry Fitch", les vendes 0, l'objectiu ha de ser la mitja de l'objectiu de les oficines de l'oest i l'identificador de l'oficina ha de ser el següent valor després del valor més alt.
 
