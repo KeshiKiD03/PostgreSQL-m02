@@ -128,7 +128,6 @@ còpia: cold backup i hot backup.
 
 https://tableplus.com/blog/2018/10/how-to-create-superuser-in-postgresql.html 
 
-
 ---------------------------------------------------------------------------------
 
 # Còpies de seguretat i restauració (Backup & restore) // Exercicis
@@ -242,6 +241,12 @@ pg_dump: reading user-defined text search configurations
 ....
 ```
 
+## SOLUCIÓ
+
+```
+pg_dump -d training -f training.sql
+```
+
 ## Pregunta 2.
 
 El mateix d'abans però ara el destí és un directori.
@@ -269,6 +274,12 @@ pg_dump: reading user-defined text search parsers
 ....
 ```
 
+```
+pg_dump -d training -F d training -f training_dir
+```
+
+## SOLUCIÓ
+
 ## Pregunta 3.
 
 El mateix d'abans però ara el destí és un fitxer tar.
@@ -288,6 +299,12 @@ pg_dump: reading procedural languages
 ....
 ```
 
+## SOLUCIÓ
+
+```
+pg_dump training -F t  -f training.tar
+```
+
 ## Pregunta 4. 
 
 El mateix d'abans però ara el destí és un fitxer tar però la base de dades és mooolt gran.
@@ -299,6 +316,28 @@ isx36579183@j05:~/Documents/m02/dataBases$ pg_dumpall -v -t > trainingAll.tar
 pg_dumpall: executing SELECT pg_catalog.set_config('search_path', '', false);
 pg_dumpall: executing SELECT oid, spcname, pg_catalog.pg_get_userbyid(spcowner) AS spcowner, pg_catalog.pg_tablespace_location(oid), (SELECT array_agg(acl ORDER BY row_n) FROM   (SELECT acl, row_n FROM      unnest(coalesce(spcacl,acldefault('t',spcowner)))      WITH ORDINALITY AS perm(acl,row_n)    WHERE NOT EXISTS (      SELECT 1      FROM unnest(acldefault('t',spcowner))        AS init(init_acl)      WHERE acl = init_acl)) AS spcacls)  AS spcacl, (SELECT array_agg(acl ORDER BY row_n) FROM   (SELECT acl, row_n FROM      unnest(acldefault('t',spcowner))      WITH ORDINALITY AS initp(acl,row_n)    WHERE NOT EXISTS (      SELECT 1      FROM unnest(coalesce(spcacl,acldefault('t',spcowner)))        AS permp(orig_acl)      WHERE acl = orig_acl)) AS rspcacls)  AS rspcacl, array_to_string(spcoptions, ', '),pg_catalog.shobj_description(oid, 'pg_tablespace') FROM pg_catalog.pg_tablespace WHERE spcname !~ '^pg_' ORDER BY 1
 ```
+
+## SOLUCIÓ
+
+I com restauraries la base de dades a partir del fitxer obtingut.
+
+
+A més de l'opció -f nom_de_fitxer (o --filename nom_de_fitxer) també podem
+redirigir a la sortida estàndard. En aquest cas ho farem així i abans farem
+servir una pipe per comprimir:
+
+```
+pg_dump  training2 -F t | gzip >  training2.tgz
+```
+
+Per restaurar:
+
+```
+gunzip -c training2.tgz | pg_restore -d training
+```
+
+Recordeu que -c és perquè gunzip en comptes de descomprimir i crear un fitxer descomprimit al directori actual, descomprimeixi i escrigui el seu contingut per la sortida estàndard ( i en aquest cas ho reculli pg_restore per l'entrada estàndard gràcies a la pipe).
+
 
 ## Pregunta 5
 
@@ -317,6 +356,13 @@ isx36579183@j05:~/Documents/m02/dataBases$ pg_dump -F t training -j 5 | gzip > t
 pg_dump: error: parallel backup only supported by the directory format
 ```
 
+## SOLUCIÓ
+
+La opció és `-j 5`.
+
+Si ho intentem fer ens mostra un missatge, que es pot confirmar al `man`, a on
+diu que aquesta opció només funciona per a directoris.
+
 > NO PODEMOS HACERLA PORQUE SOLO SOPORTA EL FORMATO -d de directorios
 
 ## Pregunta 6
@@ -334,6 +380,11 @@ isx36579183@j05:~/Documents/m02/dataBases$ file training_bkp4 sql
 training_bkp4.sql: ASCII text
 ```
 
+## SOLUCIÓ
+
+El tipus de fitxer serà un fitxer de text (plain text) i l'usuari el que
+executa l'ordre.
+
 > ASCII
 
 ## Pregunta 7
@@ -344,6 +395,7 @@ Fes una còpia de seguretat lògica només de la taula _comandes_ de tipus scrip
 pg_dump --help | grep "\-t, "
   -t, --table=PATTERN          dump the specified table(s) only
 ```
+
 
 ```yaml
 pg_dump --dbname=training -t comandes --username=isx36579183 --format=plain --file=training_bkp5.sql
@@ -359,6 +411,12 @@ drwxr-xr-x  2 isx36579183 hisx2  4096 Mar 25 08:18 backups
 -rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp4.sql
 -rw-r--r--  1 isx36579183 hisx2  3289 Mar 25 08:40 training_bkp5.sql
 -rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp.sql
+```
+
+## SOLUCIÓ
+
+```
+pg_dump training -t comandes -f comandes.sql
 ```
 
 ## Pregunta 8
@@ -382,6 +440,12 @@ drwxr-xr-x  2 isx36579183 hisx2  4096 Mar 25 08:18 backups
 -rw-r--r--  1 isx36579183 hisx2  3330 Mar 25 08:51 training_bkp6.bin
 -rw-r--r--  1 isx36579183 hisx2  9876 Mar 25 08:37 training_bkp.sql
 
+```
+
+## SOLUCIÓ
+
+```
+pg_dump training2 -t rep_vendes -F c -f rep_vendes.dat
 ```
 
 ## Pregunta 9
@@ -431,6 +495,13 @@ training=# \d
  public | productes  | table | isx36579183
  public | rep_vendes | table | isx36579183
 (5 rows)
+```
+
+
+## SOLUCIÓ
+
+```
+psql -d training < comandes.sql
 ```
 
 ## Pregunta 10
@@ -509,6 +580,15 @@ training=# \d
 (5 rows)
 ```
 
+
+## SOLUCIÓ
+
+
+```
+pg_restore -d training -t rep_vendes training.tar 
+```
+
+
 ## Pregunta 11
 
 Elimina la taula *rep_vendes* de la base de dades training.
@@ -562,6 +642,14 @@ training=# \d
 (5 rows)
 ```
 
+## SOLUCIÓ
+
+
+```
+pg_restore -d training -F c -t rep_vendes  < rep_vendes.dat
+```
+
+
 ## Pregunta 12
 
 Després de fer una `còpia` de tota la base de dades training en format binari, elimina-la.
@@ -606,6 +694,25 @@ training=# \d
 (5 rows)
 ```
 
+## SOLUCIÓ
+
+L'interessant d'aquest exercici és que un cop hem descobert que l'opció -C crea la base de dades si no està creada, la temptació és fer:
+
+
+```
+pg_restore -C -d training training.dat
+```
+
+Però clar per crear la base de dades primer ens hem de connectar a una base de
+dades que existeixi, com per exemple template1, i des d'allà si que podrà
+crear-se training.
+
+Així doncs una possible solució seria:
+
+```
+pg_restore -C  -d template1  training2.dat
+```
+
 ## Pregunta 13
 
 Per defecte, si n'hi ha un error quan fem la `restauració` psql `ignora` l'`error` i continuarà `executant`-se. Si volem que pari just quan hi hagi l'errada quina opció afegirem a l'ordre psql:
@@ -616,12 +723,30 @@ isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -Fc -d -e training trainin
 -e (exit-on-error) --> A l'hora que envia les comandes sql, ens envía un error.
 ```
 
+## SOLUCIÓ
+
+```
+psql -d training --set ON_ERROR_STOP=on < training.sql
+```
+
 ## Pregunta 14
 
 Si es vol que la `restauració` es faci en `mode` `transacció`, és a dir o es `fa` `tot` o `no` es `fa` `res`, com seria l'ordre?
 
 ```yaml
 isx36579183@j05:~/Documents/m02/dataBases$ pg_restore -aC backup.sql
+```
+
+## SOLUCIÓ
+
+```
+psql --single-transaction training < training.sql
+```
+
+o
+
+```
+psql -1 training < training.sql`
 ```
 
 ## Pregunta 15
@@ -634,6 +759,12 @@ isx36579183@j05:~/Documents/m02/dataBases$ pg_dumpall > backup_all_db.sql
 Sí, requereix de permisos d'administrador.
 ```
 
+## SOLUCIÓ
+
+```
+pg_dumpall -f backup_all_db.sql
+```
+
 ## Pregunta 16
 
 Quina ordre em permet `restaurar` totes les `bases` de `dades` d'un `cluster` a partir del fitxer `backup_all_db.sql` ? Es `necessita` ser l'`administrador` de la base de dades?
@@ -642,6 +773,12 @@ Quina ordre em permet `restaurar` totes les `bases` de `dades` d'un `cluster` a 
 isx36579183@j05:~/Documents/m02/dataBases$ psql < backup_all_db.sql
 
 Sí, requereix de permisos d'administrador.
+```
+
+## SOLUCIÓ
+
+```
+pg_dumpall -f backup_all_db.sql
 ```
 
 ## Pregunta 17
@@ -660,6 +797,18 @@ toc.dat
 3019.dat
 restore.sql
 ```
+
+## SOLUCIÓ
+
+
+
+```
+pg_dump -h 192.168.0.123 -U isxxxxxx -Ft training < training192_168_0_123.tar
+```
+
+Es pot restaurar també remotament però no és el més recomanable. Més segur
+copiar (remotament) i després restaurar localment.
+
 
 ## Pregunta 18
 
@@ -693,4 +842,22 @@ SET default_tablespace = '';
 ...
 :
 ```
+
+## SOLUCIÓ
+
+
+```
+pg_dump -h server1 training | psql -h server2 training
+```
+
+
+---------------------------------------------------------------------------------
+## LINKS
+
++ [SQL Dump](https://www.postgresql.org/docs/13/backup-dump.html)
++ [PostgreSQL: Backup And Recovery](https://en.wikibooks.org/wiki/PostgreSQL/BackupAndRecovery)
++ [PostgreSQL pg_dump Backup and pg_restore Restore Guide](https://snapshooter.com/learn/postgresql/pg_dump_pg_restore)
++ [PostgreSQL Prático/Administração/Backup e Restore](https://pt.wikibooks.org/wiki/PostgreSQL_Pr%C3%A1tico/Administra%C3%A7%C3%A3o/Backup_e_Restore)
++ [How To Backup PostgreSQL Databases on an Ubuntu VPS](https://www.digitalocean.com/community/tutorials/how-to-backup-postgresql-databases-on-an-ubuntu-vps)
++ [How To Backup and Restore PostgreSQL Database using pg_dump and psql](https://dbtut.com/index.php/2020/12/04/how-to-backup-and-restore-postgresql-database-using-pg_dump-and-psql/)
 
