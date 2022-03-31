@@ -1,6 +1,12 @@
-# Guia d'instal·lació i configuració bàsica de Borg a Debian
+z# Guia d'instal·lació i configuració bàsica de Borg a Debian
 
 **ATENCIÓ AQUEST DOCUMENT S'HA CORROMPUT AMB CADENES '????', COM QUE EL PROFESSOR NO VA FER UN BACKUP HAUREU DE RECUPERAR VOSALTRES LA INFORMACIÓ PERDUDA.**
+
+https://borgbackup.readthedocs.io/en/stable/quickstart.html 
+
+https://borgbackup.readthedocs.io/en/stable/installation.html
+
+https://packages.debian.org/stretch/borgbackup 
 
 
 ## Què és Borg?
@@ -16,12 +22,11 @@ diaris ja que només s'emmagatzemen els canvis respecte a la versió anterior.
 
 ## Instal·lació del paquet borg a Debian stable
 
-El paquet es troba al nostre repositori de manera que fare, servir l'ordre
-habitual, podem fer un `apt-get update` abans si ho considerem necessari: 
+El paquet es troba al nostre repositori de manera que fare, servir l'ordre habitual, podem fer un `apt-get update` abans si ho considerem necessari: 
 
 
-```
-?????
+```yaml
+apt-get install borgbackup
 ```
 
 
@@ -33,25 +38,57 @@ habitual, podem fer un `apt-get update` abans si ho considerem necessari:
 Inicialitzem el repositori:
 
 ```
-?????
+mkdir ./Borg
+```
+
+```yaml
+borg init --encryption=repokey /path/to/repo
+```
+
+```yaml
+borg init --encryption=repokey ./Borg
+```
+
+> Enter net passphrase: "keshi"
+
+```
+isx36579183@j05:~/Documents/m02$ borg init --encryption=repokey ./Borg
+
+Enter new passphrase: 
+Enter same passphrase again: 
+Do you want your passphrase to be displayed for verification? [yN]: y
+Your passphrase (between double-quotes): "keshi"
+Make sure the passphrase displayed above is exactly what you wanted.
+
+By default repositories initialized with this version will produce security
+errors if written to with an older version (up to and including Borg 1.0.8).
+
+If you want to use these older versions, you can disable the check by running:
+borg upgrade --disable-tam Borg
+
+See https://borgbackup.readthedocs.io/en/stable/changes.html#pre-1-0-9-manifest-spoofing-vulnerability for details about the security implications.
+
+IMPORTANT: you will need both KEY AND PASSPHRASE to access this repo!
+Use "borg key export" to export the key, optionally in printable format.
+Write down the passphrase. Store both at safe place(s).
 ```
 
 + la opció `-e repoquey` la veurem també com `--encription=repokey`.
 
-+ el valor d'encriptació repokey és el recomanat si volem compatibilitat amb
-  versions antigues. Altrament farem servir_authenticated_ per exemple. [Més
-info.](file:///usr/share/doc/borgbackup-doc/html/usage/init.html#borg-init) 
++ el valor d'encriptació repokey és el recomanat si volem compatibilitat amb versions antigues. Altrament farem servir_authenticated_ per exemple. 
 
-+ La repokey, es desa al fitxer `?????` que hi ha dintre del repositori, com
-  que no només necessitarem el password sinó també aquesta key, no oblidem de
-copiar-la i guardar-la a un lloc segur. Si ens oblidem de copiar-la fora del
-repositori, ens podem trobar amb una situació equivalent a quedar-nos fora del
-cotxe tancat amb la clau a dins.
+```
+sudo apt-get install borgbackup-doc
+```
+
+[Mésinfo](file:///usr/share/doc/borgbackup-doc/html/usage/init.html#borg-init) 
+
++ La repokey, es desa al fitxer `?????` que hi ha dintre del repositori, com que no només necessitarem el password sinó també aquesta key, no oblidem de copiar-la i guardar-la a un lloc segur. Si ens oblidem de copiar-la fora del repositori, ens podem trobar amb una situació equivalent a quedar-nos fora del  cotxe tancat amb la clau a dins.
 
 Fem un exemple de còpia de la clau, o sigui exportació,:
 
-```
-?????
+```yaml
+borg key export
 ```
 
 [Més opcions en aquest enllaç](https://borgbackup.readthedocs.io/en/stable/usage/key.html#borg-key-export)
