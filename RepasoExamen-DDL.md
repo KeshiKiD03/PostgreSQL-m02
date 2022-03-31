@@ -1,5 +1,10 @@
 # DDL
 
+file:///usr/share/doc/postgresql-doc-12/html/ddl.html 
+file:///usr/share/doc/postgresql-doc-12/html/datatype.html
+file:///usr/share/doc/postgresql-doc-12/html/queries.html
+file:///usr/share/doc/postgresql-doc-12/html/functions.html
+
 ```sql
 CREATE TABLE keshiclientes(
     idKeshi     smallint NOT NULL PRIMARY KEY,
