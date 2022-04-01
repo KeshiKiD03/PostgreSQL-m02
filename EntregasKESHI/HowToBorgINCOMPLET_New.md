@@ -1,12 +1,6 @@
-z# Guia d'instal·lació i configuració bàsica de Borg a Debian
+# Guia d'instal·lació i configuració bàsica de Borg a Debian
 
 **ATENCIÓ AQUEST DOCUMENT S'HA CORROMPUT AMB CADENES '????', COM QUE EL PROFESSOR NO VA FER UN BACKUP HAUREU DE RECUPERAR VOSALTRES LA INFORMACIÓ PERDUDA.**
-
-https://borgbackup.readthedocs.io/en/stable/quickstart.html 
-
-https://borgbackup.readthedocs.io/en/stable/installation.html
-
-https://packages.debian.org/stretch/borgbackup 
 
 
 ## Què és Borg?
@@ -22,11 +16,12 @@ diaris ja que només s'emmagatzemen els canvis respecte a la versió anterior.
 
 ## Instal·lació del paquet borg a Debian stable
 
-El paquet es troba al nostre repositori de manera que fare, servir l'ordre habitual, podem fer un `apt-get update` abans si ho considerem necessari: 
+El paquet es troba al nostre repositori de manera que fare, servir l'ordre
+habitual, podem fer un `apt-get update` abans si ho considerem necessari: 
 
 
-```yaml
-apt-get install borgbackup
+```
+?????
 ```
 
 
@@ -38,59 +33,25 @@ apt-get install borgbackup
 Inicialitzem el repositori:
 
 ```
-mkdir ./Borg
+?????
 ```
-
-```yaml
-borg init --encryption=repokey /path/to/repo
-```
-
-```yaml
-borg init --encryption=repokey ./Borg
-```
-
-> Enter net passphrase: "keshi"
-
-```
-isx36579183@j05:~/Documents/m02$ borg init --encryption=repokey ./Borg
-
-Enter new passphrase: 
-Enter same passphrase again: 
-Do you want your passphrase to be displayed for verification? [yN]: y
-Your passphrase (between double-quotes): "keshi"
-Make sure the passphrase displayed above is exactly what you wanted.
-
-By default repositories initialized with this version will produce security
-errors if written to with an older version (up to and including Borg 1.0.8).
-
-If you want to use these older versions, you can disable the check by running:
-borg upgrade --disable-tam Borg
-
-See https://borgbackup.readthedocs.io/en/stable/changes.html#pre-1-0-9-manifest-spoofing-vulnerability for details about the security implications.
-
-IMPORTANT: you will need both KEY AND PASSPHRASE to access this repo!
-Use "borg key export" to export the key, optionally in printable format.
-Write down the passphrase. Store both at safe place(s).
-```
-
-> PASSPHRASE: keshi
 
 + la opció `-e repoquey` la veurem també com `--encription=repokey`.
 
-+ el valor d'encriptació repokey és el recomanat si volem compatibilitat amb versions antigues. Altrament farem servir_authenticated_ per exemple. 
++ el valor d'encriptació repokey és el recomanat si volem compatibilitat amb
+  versions antigues. Altrament farem servir_authenticated_ per exemple. [Més
+info.](file:///usr/share/doc/borgbackup-doc/html/usage/init.html#borg-init) 
 
-```
-sudo apt-get install borgbackup-doc
-```
-
-[Mésinfo](file:///usr/share/doc/borgbackup-doc/html/usage/init.html#borg-init) 
-
-+ La repokey, es desa al fitxer `./Borg` que hi ha dintre del repositori, com que no només necessitarem el password sinó també aquesta key, no oblidem de copiar-la i guardar-la a un lloc segur. Si ens oblidem de copiar-la fora del repositori, ens podem trobar amb una situació equivalent a quedar-nos fora del  cotxe tancat amb la clau a dins.
++ La repokey, es desa al fitxer `?????` que hi ha dintre del repositori, com
+  que no només necessitarem el password sinó també aquesta key, no oblidem de
+copiar-la i guardar-la a un lloc segur. Si ens oblidem de copiar-la fora del
+repositori, ens podem trobar amb una situació equivalent a quedar-nos fora del
+cotxe tancat amb la clau a dins.
 
 Fem un exemple de còpia de la clau, o sigui exportació,:
 
-```yaml
-borg key export
+```
+?????
 ```
 
 [Més opcions en aquest enllaç](https://borgbackup.readthedocs.io/en/stable/usage/key.html#borg-key-export)
@@ -101,40 +62,18 @@ _No feu servir el format d'exportació de redirecció_
 + Si el repositori fos remot anàlogament faríem:
 
 ```
-borg key import user@isx36579183:./Borg
+?????
 ```
 
 
 ### Creació de l'arxiu backup
 
-Si fem un backup totalment físic\*, parem primer el servei, sinó podríem estem jugant a la loteria per obtenir un backup corrupte. 
-
-#### Esbrinem a on es troben les dades de les bases desades
-
-```
-sudo -u postgres psql template1
-```
+Si fem un backup totalment físic\*, parem primer el servei, sinó podríem estem
+jugant a la loteria per obtenir un backup corrupte. 
 
 ```
-show data_directory
+?????
 ```
-
-```
-template1=# show data_directory
-template1-# ;
-       data_directory        
------------------------------
- /var/lib/postgresql/13/main
-(1 row)
-```
-
-#### Parem el servei de PostgreSQL
-
-```
-sudo systemctl stop postgresql
-```
-
-#### Obtenim que les dades es troben a /vara/lib/postgresql/13/main
 
 + De què volem fer backup?
 	Dades de les bases de dades? Configuració?
@@ -145,23 +84,14 @@ sudo systemctl stop postgresql
 ...` per mostrar tot el que vulgui. Em puc ajudar del tabulador
 
 
+	```
+	?????
+	```
 
 	Creació del backup _Dijous_:
 
 	```
-    sudo borg create --list ./Borg::Dijous /var/lib/postgresql/13/main /etc/postgresql/13/main
-	```
-
-	### **Llistem**
-
-	```
-	sudo borg list ./Borg::Dijous
-	```
-
-	### **Delete**
-
-	```
-	sudo borg delete ./Borg::Dijous
+	?????
 	```
 
 
@@ -198,7 +128,7 @@ Ens carreguem primer els dos directoris `/etc/postgresql/13/main/`  `/var/lib/po
 Mirem de parar el servei de postgresl
 
 ```
-systemctl stop postgresql
+?????
 ```
 
 Comprovem que ja no tenim accés a les bases de dades template1, training ...
@@ -303,6 +233,39 @@ els que havíem eliminat abans de la còpia de Dilluns no.
 + Restaurem a Dilluns
 
 	Repetir l'acció anterior
+
+
+### Automatització amb borgmatic
+
+> Borgmatic és un script fet en Python per crear/restaurar backups cridant a
+Borg, permet múltiples configuracions i automatitza les tasques que fem a la
+consola.
+
+
+Heu de fer un vídeo _ascii_ que mostri com es fa una configuració de backup de Borg. I de restauració.
+
+Per aconseguir això, fareu:
+
+[Alerta! sempre instal·lem des de repositori, només si no queda més remei mirem
+altres alternatives](https://wiki.debian.org/DontBreakDebian)
+
++ Instal·lareu el paquet asciinema (alerta! sempre instal·lem des de repositori, només sinoó queda més remei mirem altres alternatives )
+
++ Instal·lareu el paquet borgmatic
+
++ Practicareu una configuració de backup (la que volgueu) configurant els fitxers adients.
+
++ Gravareu les instruccions tot comentant-les amb asciinema
+
++ Ho pujareu a la web de [asciinema](https://asciinema.org)
+
++ Posareu quin és el vostre link
+
+
+[Exemple d'asciinema](https://asciinema.org/a/203761)
+
+
+
 
 
 ## LINKS
