@@ -5,6 +5,8 @@ file:///usr/share/doc/postgresql-doc-12/html/datatype.html
 file:///usr/share/doc/postgresql-doc-12/html/queries.html
 file:///usr/share/doc/postgresql-doc-12/html/functions.html
 
+# 02.04.22 - PRACTICA POSTGRESQL
+
 ```sql
 CREATE TABLE keshiclientes(
     idKeshi     smallint NOT NULL PRIMARY KEY,
@@ -12,6 +14,16 @@ CREATE TABLE keshiclientes(
     data        date DEFAULT current_date,
     limit_credit    numeric(8,2)
 );
+
+keshi=> INSERT INTO keshiclientes (idkeshi) VALUES (1);
+INSERT 0 1
+
+keshi=> SELECT * FROM keshiclientes;
+ idkeshi | nom |    data    | limit_credit 
+---------+-----+------------+--------------
+       1 |     | 2022-04-02 |             
+(1 row)
+
 
 CREATE TABLE keshipelicula(
     codPel      smallint PRIMARY KEY,
@@ -21,7 +33,166 @@ CREATE TABLE keshipelicula(
     director        smallint NOT NULL,
     FOREIGN KEY(director) REFERENCES keshiclientes(idKeshi)
 );
+
+SAVEPOINT A;
 ```
+
+```SQL
+BEGIN; 
+
+-- CREATE TABLE CON CONSTRAINT A NIVEL DE TABLA
+
+CREATE TABLE keshiclientes2(
+    idKeshi2     smallint NOT NULL,
+	jefe		smallint NOT NULL,
+    nom         varchar(20),
+    data        date DEFAULT current_date,
+    limit_credit    numeric(8,2),
+	CONSTRAINT keshiclientes2_idKeshi2_jefe_pk PRIMARY KEY (idKeshi2, jefe)
+);
+
+SAVEPOINT B;
+
+-- Con PRIMARY KEY en el CAMPO y DOBLE Foreign Key Compuesto
+
+CREATE TABLE keshipelicula2(
+	id		SMALLINT CONSTRAINT id_pk PRIMARY KEY,
+    referencia      smallint NOT NULL,
+    jefe		smallint NOT NULL,
+	titol       varchar(30),
+    anyProd     smallint,
+    nacionalitat    varchar(30),
+    director        smallint NOT NULL,
+    CONSTRAINT keshipelicula2_referencia_jefe_fk FOREIGN KEY(referencia, jefe) REFERENCES keshiclientes2(idKeshi2, jefe)
+);
+
+SAVEPOINT C;
+
+
+-- Constraint CHECK de letra capital
+ALTER TABLE keshiclientes2 
+	ADD CONSTRAINT keshiclientes2_nom_check CHECK (nom = initcap(nom));
+
+
+SAVEPOINT D1;
+
+CREATE TABLE keshiadmin(
+    id      smallint,
+    admin       smallint,
+    anyProd     smallint,
+    nacionalitat    varchar(30),
+	CONSTRAINT keshiadmin_id_pk PRIMARY KEY (id)
+);
+
+-- Constraint recursiva para admin
+
+ALTER TABLE ONLY keshiadmin ADD CONSTRAINT keshiadmin_admin_fk FOREIGN KEY(admin) REFERENCES keshiadmin(id);
+
+SAVEPOINT D2;
+
+-- COPIA DE LA TABLA "keshiclientes" como MIRROR - INHERITS
+
+CREATE TABLE copyKeshiclientes(punts INTEGER)INHERITS (keshiclientes);
+
+SAVEPOINT E;
+
+COMMIT;
+
+-- Prueba de Datatype
+
+BEGIN;
+
+CREATE TABLE dataType (
+	id				SMALLINT CONSTRAINT dataType_id_pk PRIMARY KEY,
+	autoincr		SERIAL,
+	descrip			VARCHAR(20),
+	jefe			SMALLINT,
+	data			DATE DEFAULT current_date,
+	actiu			BOOLEAN DEFAULT 'True',
+	limit_credit	NUMERIC(8,2),
+	edat			SMALLINT,
+	parrafo			TEXT NOT NULL,
+	hora			TIMESTAMP,
+	CONSTRAINT dataType_edat_ck CHECK (edat>0)
+);
+
+-- Añadimos el Alter
+
+ALTER TABLE ONLY dataType ADD CONSTRAINT dataType_jefe_fk FOREIGN KEY (jefe) REFERENCES dataType(id);
+
+COMMIT;
+```
+
+```SQL
+
+psql training;
+
+-- CREATE TABLE A PARTIR DE SELECT
+
+CREATE TABLE oficines_est 
+    AS (SELECT oficina, ciutat, objectiu, vendes
+          FROM oficines
+         WHERE regio = 'Oest');
+
+-- CREATE TABLE TEMPORAL
+
+
+CREATE LOCAL TEMPORARY TABLE table2 ...; 
+
+
+```
+
+* Política a l'incomplir la integritat referencial
+
+    ON DELETE: què fer si trenquem integritat referencial en esborrar una fila de la taula referenciada.
+
+    ON UPDATE: què fer si trenquem integritat referencial en modificar una fila de la taula referenciada.
+
++ Possibles accions:
+
+    RESTRICT: retorna un error i no es deixa fer l'operació.
+    CASCADE: esborra o modifica les files afectades.
+    SET DEFAULT: es posa el valor per defecte.
+    SET NULL: es posa el valor a NULL.
+
+```SQL
+CREATE TABLE dataType (
+	id				SMALLINT CONSTRAINT dataType_id_pk PRIMARY KEY,
+	autoincr		SERIAL,
+	descrip			VARCHAR(20),
+	jefe			SMALLINT CONSTRAINT dataType_jefe_fk REFERENCES (id),
+	data			DATE DEFAULT current_date,
+	actiu			BOOLEAN DEFAULT 'True',
+	limit_credit	NUMERIC(8,2),
+	edat			SMALLINT,
+	parrafo			TEXT NOT NULL,
+	hora			TIMESTAMP,
+	CONSTRAINT dataType_edat_ck CHECK (edat>0)
+
+
+);
+```
+
+
+# CHECKS
+
+```sql
+
+-- Crear constraints con CHECK
+
+-- Constraint de Check de Nombre empieza por Nombre Capital
+CONSTRAINT CK_REP_VENDES_NOM CHECK(NOM = INITCAP(NOM)),
+
+-- Constraint de CHECK de EDAT sea mayor que 0
+CONSTRAINT CK_REP_VENDES_EDAT CHECK(EDAT>0),
+
+-- Constraint de CHECK de Ventas sean mayor que 0
+CONSTRAINT CK_REP_VENDES_VENDES CHECK(VENDES>0),
+
+-- Constraint de CHECK de Cuota sean mayor que 0
+CONSTRAINT CK_REP_VENDES_QUOTA CHECK(QUOTA>0),
+```
+
 # Primary Key
 
 ### SIMPLE
@@ -48,6 +219,12 @@ CREATE TABLE keshipelicula(
         CONSTRAINT dept_deptno_pk PRIMARY KEY (deptno)
     );
 ```
+
+- Les sentències SQL que usarem són:
+
+	+ CREATE (crea)
+	+ DROP (esborra)
+	+ ALTER (modifica)
 
 ### COMPUESTA
 ```sql
