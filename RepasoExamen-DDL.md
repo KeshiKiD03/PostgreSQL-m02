@@ -116,9 +116,9 @@ CREATE TABLE dataType (
 	CONSTRAINT dataType_edat_ck CHECK (edat>0)
 );
 
--- Añadimos el Alter
+-- Añadimos el Alter // No hay ALTER DE CONSTRAINTS
 
-ALTER TABLE ONLY dataType ADD CONSTRAINT dataType_jefe_fk FOREIGN KEY (jefe) REFERENCES dataType(id);
+ALTER TABLE ONLY dataType ADD CONSTRAINT dataType_jefe_fk FOREIGN KEY (jefe) REFERENCES dataType(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 COMMIT;
 ```
@@ -141,6 +141,29 @@ CREATE LOCAL TEMPORARY TABLE table2 ...;
 
 
 ```
+
+- Ejemplos
+
+*No se puede eliminar o modificar un código "editoriales" si existen libros con dicho "código"*
+
+
+*¿Intentamos insertar una factura con un número de cliente que no existe?*
+
+*¿Borramos un cliente que tiene una factura asignada?*
+
+ON DELETE RESTRICT - ON UPDATE CASCADE --> No se puede borrar y si se modifica se cambia también
+
+https://e-mc2.net/blog/integridad-referencial-con-postgresql/ 
+
+Y accion puede tener estos valores:
+
+    NO ACTION: Produce un error indicando que un DELETE ó UPDATE creará una violación de la clave foránea definida.
+    RESTRICT: Produce un error indicando que un DELETE ó UPDATE creará una violación de la clave foránea definida.
+    CASCADE: Borra ó actualiza automáticamente todas las referencias activas
+    SET NULL: Define las referencias activas como NULL
+    SET DEFAULT: Define las referencias activas como el valor por defecto (si está definido) de las mismas
+
+En nuestro ejemplo hemos definido que ninguna columna de nuestra clave foránea puede ser NULL, que no se pueda borrar una clave foránea con referencias activas y que en caso de actualizar el valor de una clave foránea, se actualicen tambien todas las referencias a la misma automáticamente.
 
 * Política a l'incomplir la integritat referencial
 
@@ -172,6 +195,108 @@ CREATE TABLE dataType (
 
 );
 ```
+
+# ALTER CON CONSTRAINTS + INTEGRIDAD
+
+* Añade una columna o un constraint
+
+ALTER TABLE *nombreTabla*
+ADD [COLUMN] [CONSTRAINT] *ACTION*
+
+
+* Modifica una columna
+
+ALTER TABLE *nombreTabla*
+ALTER [COLUMN] *nombreColumna*
+
+* Borra una columna o constraint
+
+ALTER TABLE *nombreTabla*
+DROP [COLUMN] [CONSTRAINT] *nombreColumna* O *nombreConstraint*
+
+* Cambia el nombre de la columna o constraint
+
+ALTER TABLE *nombreTabla*
+RENAME [COLUMN] [CONSTRAINT] *col_name* o *constraint_name* TO
+
+* Modifica el TIPO DE DATO de la COLUMNA
+ALTER TABLE *nombreTabla*
+ALTER [COLUMN] *nombreColumna* SET DATA TYPE *data_type*
+
+```SQL
+BEGIN;
+
+ALTER TABLE datatype RENAME actiu TO hola;
+
+ALTER TABLE datatype ALTER COLUMN hola DROP DEFAULT;
+
+ALTER TABLE datatype ALTER COLUMN hola SET DATA TYPE varchar(20); 
+
+ROLLBACK;
+```
+
+OTROS EJEMPLOS
+
+   ADD [ COLUMN ] [ IF NOT EXISTS ] column_name data_type [ COLLATE collation ] [ column_constraint [ ... ] ]
+
+    DROP [ COLUMN ] [ IF EXISTS ] column_name [ RESTRICT | CASCADE ]
+
+    ALTER [ COLUMN ] column_name [ SET DATA ] TYPE data_type [ COLLATE collation ] [ USING expression ]
+
+    ALTER [ COLUMN ] column_name SET DEFAULT expression
+
+    ALTER [ COLUMN ] column_name DROP DEFAULT
+
+    ALTER [ COLUMN ] column_name { SET | DROP } NOT NULL
+
+    ALTER [ COLUMN ] column_name DROP EXPRESSION [ IF EXISTS ]
+
+    ALTER [ COLUMN ] column_name ADD GENERATED { ALWAYS | BY DEFAULT } AS 
+
+	IDENTITY [ ( sequence_options ) ]
+
+    ALTER [ COLUMN ] column_name { SET GENERATED { ALWAYS | BY DEFAULT } | SET sequence_option | RESTART [ [ WITH ] restart ] } [...]
+
+    ALTER [ COLUMN ] column_name DROP IDENTITY [ IF EXISTS ]
+
+    ALTER [ COLUMN ] column_name SET STATISTICS integer
+
+    ALTER [ COLUMN ] column_name SET ( attribute_option = value [, ... ] )
+
+    ALTER [ COLUMN ] column_name RESET ( attribute_option [, ... ] )
+
+    ALTER [ COLUMN ] column_name SET STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN }
+    ALTER [ COLUMN ] column_name SET COMPRESSION compression_method
+    ADD table_constraint [ NOT VALID ]
+    ADD table_constraint_using_index
+    ALTER CONSTRAINT constraint_name [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+    VALIDATE CONSTRAINT constraint_name
+    DROP CONSTRAINT [ IF EXISTS ]  constraint_name [ RESTRICT | CASCADE ]
+    DISABLE TRIGGER [ trigger_name | ALL | USER ]
+    ENABLE TRIGGER [ trigger_name | ALL | USER ]
+    ENABLE REPLICA TRIGGER trigger_name
+    ENABLE ALWAYS TRIGGER trigger_name
+    DISABLE RULE rewrite_rule_name
+    ENABLE RULE rewrite_rule_name
+    ENABLE REPLICA RULE rewrite_rule_name
+    ENABLE ALWAYS RULE rewrite_rule_name
+    DISABLE ROW LEVEL SECURITY
+    ENABLE ROW LEVEL SECURITY
+    FORCE ROW LEVEL SECURITY
+    NO FORCE ROW LEVEL SECURITY
+    CLUSTER ON index_name
+    SET WITHOUT CLUSTER
+    SET WITHOUT OIDS
+    SET TABLESPACE new_tablespace
+    SET { LOGGED | UNLOGGED }
+    SET ( storage_parameter [= value] [, ... ] )
+    RESET ( storage_parameter [, ... ] )
+    INHERIT parent_table
+    NO INHERIT parent_table
+    OF type_name
+    NOT OF
+    OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
+    REPLICA IDENTITY { DEFAULT | USING INDEX index_name | FULL | NOTHING }
 
 
 # CHECKS
