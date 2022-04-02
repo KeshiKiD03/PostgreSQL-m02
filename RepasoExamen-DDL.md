@@ -232,8 +232,30 @@ ALTER TABLE datatype ALTER COLUMN hola DROP DEFAULT;
 
 ALTER TABLE datatype ALTER COLUMN hola SET DATA TYPE varchar(20); 
 
+-- To add a column with a non-null default:
+
+ALTER TABLE datatype
+  ADD COLUMN mtime timestamp with time zone DEFAULT now();
+
+-- To add a column and fill it with a value different from the default to be used later:
+
+ALTER TABLE datatype
+  ADD COLUMN status varchar(30) DEFAULT 'old',
+  ALTER COLUMN status SET default 'current';
+
 ROLLBACK;
 ```
+
+* To add a not-null constraint to a column:
+
+ALTER TABLE distributors ALTER COLUMN street SET NOT NULL;
+
+* To remove a not-null constraint from a column:
+
+ALTER TABLE distributors ALTER COLUMN street DROP NOT NULL;
+
+<br>
+<br>
 
 OTROS EJEMPLOS
 
