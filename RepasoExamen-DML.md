@@ -1,6 +1,93 @@
 
 # DML
 
+## REPASO
+
+```SQL
+-- PRIMER EJEMPLO
+
+BEGIN;
+
+CREATE TABLE keshiserial (idserial serial, nom varchar(20), data date DEFAULT current_date, limit_credit numeric(8,2));
+
+SAVEPOINT insert1;
+
+-- Insert explícito
+
+INSERT INTO keshiserial VALUES (0,'Keshi', DEFAULT, 45678);
+
+SAVEPOINT insert2;
+
+-- Insert implícito
+
+INSERT INTO keshiserial (nom, data, limit_credit) VALUES ('John', DEFAULT, 45674);
+
+SAVEPOINT insert3;
+
+ROLLBACK;
+
+------ EJEMPLO OTRO
+
+BEGIN;
+
+CREATE TABLE keshiserial (idserial serial, nom varchar(20), data date DEFAULT current_date, limit_credit numeric(8,2));
+
+SAVEPOINT insert1;
+
+insert into keshiserial (nom, data, limit_credit) values ('John', DEFAULT, 45678);
+
+SAVEPOINT insert2;
+
+INSERT INTO keshiserial (nom, data, limit_credit) VALUES ('John', DEFAULT, 45674);
+
+SAVEPOINT insert3;
+```
+
+```SQL
+-- INSERT CON NULL
+
+INSERT INTO keshiserial (nom, data, limit_credit) VALUES ('Nom', NULL, 43986);
+
+```
+
+keshi=> SELECT * FROM keshiserial;
+ idserial | nom  |    data    | limit_credit 
+----------+------+------------+--------------
+        1 | John | 2022-04-03 |     45678.00
+        2 | John | 2022-04-03 |     45674.00
+        3 | Nom  |            |     43986.00
+(3 rows)
+
+```
+BEGIN;
+
+CREATE TABLE keshiserial (idserial serial, nom varchar(20), data timestamp DEFAULT current_timestamp, limit_credit numeric(8,2));
+
+INSERT INTO keshiserial (nom, data, limit_credit) VALUES ('Keshi', DEFAULT, 56897);
+
+INSERT INTO keshiserial (nom, data, limit_credit) VALUES ('John', NULL, 56897);
+
+SAVEPOINT insertd1;
+
+```
+
+keshi=> SELECT * FROM keshiserial;
+ idserial |  nom  |            data            | limit_credit 
+----------+-------+----------------------------+--------------
+        1 | Keshi | 2022-04-03 11:43:38.094037 |     56897.00
+        2 | John  |                            |     56897.00
+(2 rows)
+
+* Insert a partir de SUBCONSULTAS
+
+```
+INSERT INTO directors(id, nom, carrec)
+SELECT num_empl, nom, carrec
+FROM rep_vendes
+WHERE carrec = 'Dir Vendes';
+```
+
+
 # INSERT
 
 ```sql
@@ -56,6 +143,24 @@ WHERE carrec = 'Dir Vendes';
     Ha de coincidir el número de columnas de la clausula INSERT con la de la subconsulta.
 
     No se usa la clausula VALUES.
+
+## REPASO UPDATE
+
+
+UPDATE *nombreTabla*
+SET *columnaACambiar*
+[WHERE];
+
+Se ha de modificar la categoria y la oficina del emplado 666, con los valores actuales que son 110.
+
+* Subconsultas
+
+UPDATE rep_vendes
+	SET (carrec, oficina_rep) =
+	(SELECT carrec, oficina_rep
+		FROM rep_vendes
+		WHERE num_empl = 110)
+WHERE num_empl = 666;
 
 
 # UPDATE
