@@ -5,37 +5,6 @@
 ## CONCURRENCIA Y BLOQUEOS DE BD
 
 ### KESHI
-
-- Usuarios atacan una base de datos al mismo tiempo.
-
-\set PROMPT1 '[Alice] %/%R%# ' --> Cambiar el PROMPT
-
-
-Alice i Bob volen jugar amb el cotxe **(RowExclusiveLock)**
-
-
-Alice vol jugar amb totes les joguines alhora 
-**(AccessExclusiveLock)**
-
-
-**`LOCK TABLE toys IN ACCESS EXCLUSIVE MODE;`**
-
-
-Alice vol triar una joguina i que ningú li tregui fins que es decideixi **(RowExclusiveLock)**
-
-*INSTRUCCIONES EXPLÍCITAS* --> Fem servir l'ordre SELECT ... FROM table **`FOR UPDATE`** que bloqueja les files
-retornades pel SELECT fins que termini l'actual transacció.
-
-Bloqueo de un grupo de FILAS --> **`FOR UPDATE`**
-
-
-
-No es pot jugar amb dues joguines alhora! **(deadlock)**
-
----------------------------------------------------------------------------------
-
-## PROFE
-
 # Concurrència i bloquejos
 
 Quan diversos usuaris/processos ataquen una base de dades podem tenir problemes amb la consistència de les dades. És per això que cada gestor de bases de dades intenta solucionar aquest problema de diverses maneres. Anem a veure com funciona PostgreSQL amb un exemple. (Basat en [Exploring Query Locks in Postgres](http://big-elephants.com/2013-09/exploring-query-locks-in-postgres/))
@@ -47,9 +16,16 @@ Quan diversos usuaris/processos ataquen una base de dades podem tenir problemes 
 Creem la base de dades _sandbox_, la taula _toys_ i afegim  un _cotxet_, una _excavadora_ i una _pala_.
 
 ```SQL
+
+-- Creem la DB
+
 CREATE DATABASE sandbox;
 
+-- Ens conectem a la sandbox
+
 \c sandbox
+
+-- Creem la taula de TOYS
 
 CREATE TABLE toys (
 	PRIMARY KEY(id),
@@ -73,7 +49,7 @@ Hi ha concurrència.
 Alice:
 ```SQL
 psql sandbox
-\set PROMPT1 '[Alice] %/%R%# '
+\set PROMPT1 '[Alice] %/%R%# ' -- %R es el nombre de la DATABASE
 ```
 
 Bob:
@@ -88,6 +64,7 @@ _%R_ ...
 
 ### Alice i Bob miren les joguines (AccessShareLock)
 
+* Sol: No pasa nada, todo good
 
 Alice:
 ```SQL
@@ -119,7 +96,7 @@ No hi ha problema!!!
 
 ### Alice vol jugar amb l'excavadora i Bob vol jugar amb la pala (RowExclusiveLock)
 
-
+* Sol: No interfieren ya que se bloquean filas diferentes.
 
 Alice juga amb l'excavadora (digger): incrementem en 1 el número de cops que
 s'utilitza aquesta joguina.
@@ -179,11 +156,13 @@ COMMIT
 (3 rows)
 ```
 
-Cap problema, cadascú usa la joguina que vol. S'estan bloquejant files
-diferents. En quant es fan els dos COMMIT a la base de dades queden modificades
-les dues files.
+Cap problema, cadascú usa la joguina que **vol**. S'estan __bloquejant__ __files__
+__diferents__. En quant es fan els dos __COMMIT__ a la base de dades queden modificades
+les __dues files__.
 
 ### Alice i Bob volen jugar amb el cotxe (RowExclusiveLock)
+
+* Sol: RowExclusiveLock - Usan el mismo campo por lo cual FCFS y el otro se espera.
 
 Alice és la que agafa primer el cotxe:
 
@@ -199,6 +178,9 @@ Bob encara veu les dades antigues, perquè Alice no ha fet el COMMIT:
 ```SQL
 [Bob] sandbox=> BEGIN;
 BEGIN
+
+-- Todavía ve lo antiguo ya que Alice no ha hecho COMMIT.
+
 [Bob] sandbox=> SELECT * FROM toys;
  id |  name  | usage
 ----+--------+-------
@@ -212,6 +194,8 @@ Però ara Bob també vol el cotxe!
 
 ```SQL
 [Bob] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 1;
+
+-- A partir de aquí se hace el BLOQUEO, porque usan el mismo juguete.
 ```
 
 Ara el terminal es queda "penjat" ja que Alice té bloquejada la fila (és a dir,
@@ -220,6 +204,9 @@ de moment no li deixa el cotxe).
 Alice decideix no jugar amb el cotxe i fa un ROLLBACK:
 
 ```SQL
+
+-- Para que Alice deje el juguete tiene que hacer un ROLLBACK o COMMIT. Este caso es ROLLBACK;
+
 [Alice] sandbox=> ROLLBACK;
 ROLLBACK
 ```
@@ -239,13 +226,15 @@ COMMIT
   3 | shovel |     1
   1 | car    |     1
 (3 rows)
+
+-- Bob ha usado el juguete.
 ```
 
 ### Alice vol jugar amb totes les joguines alhora (AccessExclusiveLock)
 
 Alice vol jugar amb tot, fem un bloqueig explícit amb l'ordre LOCK:
 
-
+* Sol: LOCK TABLE toys IN ACCESS EXCLUSIVE MODE; --> Bloquea la tabla
 
 ```SQL
 [Alice] sandbox=> BEGIN;
@@ -260,6 +249,8 @@ jugant-hi la té bloquejada!
 ```SQL
 [Bob] sandbox=> BEGIN; UPDATE toys SET usage = usage+1 WHERE id = 2;
 BEGIN
+
+-- Aquí se queda colgada
 ```
 
 Li diem a Alice que això de tenir-ho tot sense jugar-hi no està bé. La convencem i fa un COMMIT:
@@ -269,7 +260,7 @@ Li diem a Alice que això de tenir-ho tot sense jugar-hi no està bé. La conven
 COMMIT
 ```
 
-Ara Bob ja pot jugar amb l'excavadora!
+``Ara Bob ja pot jugar amb l'excavadora!``
 
 ```SQL
 UPDATE 1
@@ -286,10 +277,12 @@ COMMIT
 
 ### Alice vol triar una joguina i que ningú li tregui fins que es decideixi (RowExclusiveLock)
 
+* Sol: FOR UPDATE - RowExclusiveLock --> FOR UPDATE, lo mismo que el anterior, las mira y las bloquea. FCFS.
+
 Similar al que ha fet abans, les mira i les bloqueja...
 
-Fem servir l'ordre _SELECT ... FROM table FOR UPDATE_ que bloqueja les files
-retornades pel SELECT fins que termini l'actual transacció.
+Fem servir l'ordre _SELECT ... FROM table FOR UPDATE_ que 
+bloqueja les files retornades pel SELECT fins que termini l'actual transacció.
 
 
 ```SQL
@@ -307,6 +300,8 @@ Bob intenta jugar amb la pala:
 
 ```SQL
 [Bob] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 2;
+
+-- Se queda colgado a aquí
 ```
 
 I no pot.
@@ -333,6 +328,9 @@ UPDATE 1
 
 ### No es pot jugar amb dues joguines alhora! (deadlock)
 
+* Sol: Cuando se intenta hacer un UPDATE y otro quiere hacer otro UPDATE en el mismo campo, se produce un DEADLOCK y reactiva el primero que lo ha __UTILIZADO__. En este caso Alice hace un update el COCHE y luego BOB hace un UPDATE de la PALA, ALICE no puede USAR la PALA al mismo tiempo, porque lo tiene BOB y se le queda pillado a ALICE.
+Bob realiza un UPDATE al COCHE (Lo tiene Alice), saldrá el error de DEADLOCK a BOB y desbloquea a ALICE.
+
 Alice juga amb el cotxe
 
 ```SQL
@@ -353,9 +351,11 @@ Alice intenta jugar amb l'excavadora, però Bob la té bloquejada. Alice es qued
 
 ```SQL
 [Alice] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 2;
+
+-- Se queda colgado aquí
 ```
 
-Bob no deixa l'excavadora, però intenta jugar amb el cotxe, però Alice el té bloquejat i es queda esperant... Però no pot Alice no el pot desbloquejar perquè ella està esperant el desbloqueig de Bob!!!
+Bob no deixa __l'excavadora__, però intenta jugar amb el cotxe, però Alice el té bloquejat i es queda esperant... Però no pot Alice no el pot desbloquejar perquè ella està esperant el desbloqueig de Bob!!!
 
 ```SQL
 [Bob] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 1;
@@ -380,6 +380,7 @@ COMMIT
   2 | digger |     4
 (3 rows)
 ```
+
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
