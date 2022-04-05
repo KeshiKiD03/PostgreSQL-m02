@@ -5,6 +5,8 @@ file:///usr/share/doc/postgresql-doc-12/html/datatype.html
 file:///usr/share/doc/postgresql-doc-12/html/queries.html
 file:///usr/share/doc/postgresql-doc-12/html/functions.html
 
+# 02.04.22 - PRACTICA POSTGRESQL
+
 ```sql
 CREATE TABLE keshiclientes(
     idKeshi     smallint NOT NULL PRIMARY KEY,
@@ -12,6 +14,16 @@ CREATE TABLE keshiclientes(
     data        date DEFAULT current_date,
     limit_credit    numeric(8,2)
 );
+
+keshi=> INSERT INTO keshiclientes (idkeshi) VALUES (1);
+INSERT 0 1
+
+keshi=> SELECT * FROM keshiclientes;
+ idkeshi | nom |    data    | limit_credit 
+---------+-----+------------+--------------
+       1 |     | 2022-04-02 |             
+(1 row)
+
 
 CREATE TABLE keshipelicula(
     codPel      smallint PRIMARY KEY,
@@ -21,7 +33,313 @@ CREATE TABLE keshipelicula(
     director        smallint NOT NULL,
     FOREIGN KEY(director) REFERENCES keshiclientes(idKeshi)
 );
+
+SAVEPOINT A;
 ```
+
+```SQL
+BEGIN; 
+
+-- CREATE TABLE CON CONSTRAINT A NIVEL DE TABLA
+
+CREATE TABLE keshiclientes2(
+    idKeshi2     smallint NOT NULL,
+	jefe		smallint NOT NULL,
+    nom         varchar(20),
+    data        date DEFAULT current_date,
+    limit_credit    numeric(8,2),
+	CONSTRAINT keshiclientes2_idKeshi2_jefe_pk PRIMARY KEY (idKeshi2, jefe)
+);
+
+SAVEPOINT B;
+
+-- Con PRIMARY KEY en el CAMPO y DOBLE Foreign Key Compuesto
+
+CREATE TABLE keshipelicula2(
+	id		SMALLINT CONSTRAINT id_pk PRIMARY KEY,
+    referencia      smallint NOT NULL,
+    jefe		smallint NOT NULL,
+	titol       varchar(30),
+    anyProd     smallint,
+    nacionalitat    varchar(30),
+    director        smallint NOT NULL,
+    CONSTRAINT keshipelicula2_referencia_jefe_fk FOREIGN KEY(referencia, jefe) REFERENCES keshiclientes2(idKeshi2, jefe)
+);
+
+SAVEPOINT C;
+
+
+-- Constraint CHECK de letra capital
+ALTER TABLE keshiclientes2 
+	ADD CONSTRAINT keshiclientes2_nom_check CHECK (nom = initcap(nom));
+
+
+SAVEPOINT D1;
+
+CREATE TABLE keshiadmin(
+    id      smallint,
+    admin       smallint,
+    anyProd     smallint,
+    nacionalitat    varchar(30),
+	CONSTRAINT keshiadmin_id_pk PRIMARY KEY (id)
+);
+
+-- Constraint recursiva para admin
+
+ALTER TABLE ONLY keshiadmin ADD CONSTRAINT keshiadmin_admin_fk FOREIGN KEY(admin) REFERENCES keshiadmin(id);
+
+SAVEPOINT D2;
+
+-- COPIA DE LA TABLA "keshiclientes" como MIRROR - INHERITS
+
+CREATE TABLE copyKeshiclientes(punts INTEGER)INHERITS (keshiclientes);
+
+SAVEPOINT E;
+
+COMMIT;
+
+-- Prueba de Datatype
+
+BEGIN;
+
+CREATE TABLE dataType (
+	id				SMALLINT CONSTRAINT dataType_id_pk PRIMARY KEY,
+	autoincr		SERIAL,
+	descrip			VARCHAR(20),
+	jefe			SMALLINT,
+	data			DATE DEFAULT current_date,
+	actiu			BOOLEAN DEFAULT 'True',
+	limit_credit	NUMERIC(8,2),
+	edat			SMALLINT,
+	parrafo			TEXT NOT NULL,
+	hora			TIMESTAMP,
+	CONSTRAINT dataType_edat_ck CHECK (edat>0)
+);
+
+-- Añadimos el Alter // No hay ALTER DE CONSTRAINTS
+
+ALTER TABLE ONLY dataType ADD CONSTRAINT dataType_jefe_fk FOREIGN KEY (jefe) REFERENCES dataType(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+COMMIT;
+```
+
+```SQL
+
+psql training;
+
+-- CREATE TABLE A PARTIR DE SELECT
+
+CREATE TABLE oficines_est 
+    AS (SELECT oficina, ciutat, objectiu, vendes
+          FROM oficines
+         WHERE regio = 'Oest');
+
+-- CREATE TABLE TEMPORAL
+
+
+CREATE LOCAL TEMPORARY TABLE table2 ...; 
+
+
+```
+
+- Ejemplos
+
+*No se puede eliminar o modificar un código "editoriales" si existen libros con dicho "código"*
+
+
+*¿Intentamos insertar una factura con un número de cliente que no existe?*
+
+*¿Borramos un cliente que tiene una factura asignada?*
+
+ON DELETE RESTRICT - ON UPDATE CASCADE --> No se puede borrar y si se modifica se cambia también
+
+https://e-mc2.net/blog/integridad-referencial-con-postgresql/ 
+
+Y accion puede tener estos valores:
+
+    NO ACTION: Produce un error indicando que un DELETE ó UPDATE creará una violación de la clave foránea definida.
+    RESTRICT: Produce un error indicando que un DELETE ó UPDATE creará una violación de la clave foránea definida.
+    CASCADE: Borra ó actualiza automáticamente todas las referencias activas
+    SET NULL: Define las referencias activas como NULL
+    SET DEFAULT: Define las referencias activas como el valor por defecto (si está definido) de las mismas
+
+En nuestro ejemplo hemos definido que ninguna columna de nuestra clave foránea puede ser NULL, que no se pueda borrar una clave foránea con referencias activas y que en caso de actualizar el valor de una clave foránea, se actualicen tambien todas las referencias a la misma automáticamente.
+
+* Política a l'incomplir la integritat referencial
+
+    ON DELETE: què fer si trenquem integritat referencial en esborrar una fila de la taula referenciada.
+
+    ON UPDATE: què fer si trenquem integritat referencial en modificar una fila de la taula referenciada.
+
++ Possibles accions:
+
+    RESTRICT: retorna un error i no es deixa fer l'operació.
+    CASCADE: esborra o modifica les files afectades.
+    SET DEFAULT: es posa el valor per defecte.
+    SET NULL: es posa el valor a NULL.
+
+```SQL
+CREATE TABLE dataType (
+	id				SMALLINT CONSTRAINT dataType_id_pk PRIMARY KEY,
+	autoincr		SERIAL,
+	descrip			VARCHAR(20),
+	jefe			SMALLINT CONSTRAINT dataType_jefe_fk REFERENCES (id),
+	data			DATE DEFAULT current_date,
+	actiu			BOOLEAN DEFAULT 'True',
+	limit_credit	NUMERIC(8,2),
+	edat			SMALLINT,
+	parrafo			TEXT NOT NULL,
+	hora			TIMESTAMP,
+	CONSTRAINT dataType_edat_ck CHECK (edat>0)
+
+
+);
+```
+
+# ALTER CON CONSTRAINTS + INTEGRIDAD
+
+* Añade una columna o un constraint
+
+ALTER TABLE *nombreTabla*
+ADD [COLUMN] [CONSTRAINT] *ACTION*
+
+
+* Modifica una columna
+
+ALTER TABLE *nombreTabla*
+ALTER [COLUMN] *nombreColumna*
+
+* Borra una columna o constraint
+
+ALTER TABLE *nombreTabla*
+DROP [COLUMN] [CONSTRAINT] *nombreColumna* O *nombreConstraint*
+
+* Cambia el nombre de la columna o constraint
+
+ALTER TABLE *nombreTabla*
+RENAME [COLUMN] [CONSTRAINT] *col_name* o *constraint_name* TO
+
+* Modifica el TIPO DE DATO de la COLUMNA
+ALTER TABLE *nombreTabla*
+ALTER [COLUMN] *nombreColumna* SET DATA TYPE *data_type*
+
+```SQL
+BEGIN;
+
+ALTER TABLE datatype RENAME actiu TO hola;
+
+ALTER TABLE datatype ALTER COLUMN hola DROP DEFAULT;
+
+ALTER TABLE datatype ALTER COLUMN hola SET DATA TYPE varchar(20); 
+
+-- To add a column with a non-null default:
+
+ALTER TABLE datatype
+  ADD COLUMN mtime timestamp with time zone DEFAULT now();
+
+-- To add a column and fill it with a value different from the default to be used later:
+
+ALTER TABLE datatype
+  ADD COLUMN status varchar(30) DEFAULT 'old',
+  ALTER COLUMN status SET default 'current';
+
+ROLLBACK;
+```
+
+* To add a not-null constraint to a column:
+
+ALTER TABLE distributors ALTER COLUMN street SET NOT NULL;
+
+* To remove a not-null constraint from a column:
+
+ALTER TABLE distributors ALTER COLUMN street DROP NOT NULL;
+
+<br>
+<br>
+
+OTROS EJEMPLOS
+
+   ADD [ COLUMN ] [ IF NOT EXISTS ] column_name data_type [ COLLATE collation ] [ column_constraint [ ... ] ]
+
+    DROP [ COLUMN ] [ IF EXISTS ] column_name [ RESTRICT | CASCADE ]
+
+    ALTER [ COLUMN ] column_name [ SET DATA ] TYPE data_type [ COLLATE collation ] [ USING expression ]
+
+    ALTER [ COLUMN ] column_name SET DEFAULT expression
+
+    ALTER [ COLUMN ] column_name DROP DEFAULT
+
+    ALTER [ COLUMN ] column_name { SET | DROP } NOT NULL
+
+    ALTER [ COLUMN ] column_name DROP EXPRESSION [ IF EXISTS ]
+
+    ALTER [ COLUMN ] column_name ADD GENERATED { ALWAYS | BY DEFAULT } AS 
+
+	IDENTITY [ ( sequence_options ) ]
+
+    ALTER [ COLUMN ] column_name { SET GENERATED { ALWAYS | BY DEFAULT } | SET sequence_option | RESTART [ [ WITH ] restart ] } [...]
+
+    ALTER [ COLUMN ] column_name DROP IDENTITY [ IF EXISTS ]
+
+    ALTER [ COLUMN ] column_name SET STATISTICS integer
+
+    ALTER [ COLUMN ] column_name SET ( attribute_option = value [, ... ] )
+
+    ALTER [ COLUMN ] column_name RESET ( attribute_option [, ... ] )
+
+    ALTER [ COLUMN ] column_name SET STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN }
+    ALTER [ COLUMN ] column_name SET COMPRESSION compression_method
+    ADD table_constraint [ NOT VALID ]
+    ADD table_constraint_using_index
+    ALTER CONSTRAINT constraint_name [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
+    VALIDATE CONSTRAINT constraint_name
+    DROP CONSTRAINT [ IF EXISTS ]  constraint_name [ RESTRICT | CASCADE ]
+    DISABLE TRIGGER [ trigger_name | ALL | USER ]
+    ENABLE TRIGGER [ trigger_name | ALL | USER ]
+    ENABLE REPLICA TRIGGER trigger_name
+    ENABLE ALWAYS TRIGGER trigger_name
+    DISABLE RULE rewrite_rule_name
+    ENABLE RULE rewrite_rule_name
+    ENABLE REPLICA RULE rewrite_rule_name
+    ENABLE ALWAYS RULE rewrite_rule_name
+    DISABLE ROW LEVEL SECURITY
+    ENABLE ROW LEVEL SECURITY
+    FORCE ROW LEVEL SECURITY
+    NO FORCE ROW LEVEL SECURITY
+    CLUSTER ON index_name
+    SET WITHOUT CLUSTER
+    SET WITHOUT OIDS
+    SET TABLESPACE new_tablespace
+    SET { LOGGED | UNLOGGED }
+    SET ( storage_parameter [= value] [, ... ] )
+    RESET ( storage_parameter [, ... ] )
+    INHERIT parent_table
+    NO INHERIT parent_table
+    OF type_name
+    NOT OF
+    OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
+    REPLICA IDENTITY { DEFAULT | USING INDEX index_name | FULL | NOTHING }
+
+
+# CHECKS
+
+```sql
+
+-- Crear constraints con CHECK
+
+-- Constraint de Check de Nombre empieza por Nombre Capital
+CONSTRAINT CK_REP_VENDES_NOM CHECK(NOM = INITCAP(NOM)),
+
+-- Constraint de CHECK de EDAT sea mayor que 0
+CONSTRAINT CK_REP_VENDES_EDAT CHECK(EDAT>0),
+
+-- Constraint de CHECK de Ventas sean mayor que 0
+CONSTRAINT CK_REP_VENDES_VENDES CHECK(VENDES>0),
+
+-- Constraint de CHECK de Cuota sean mayor que 0
+CONSTRAINT CK_REP_VENDES_QUOTA CHECK(QUOTA>0),
+```
+
 # Primary Key
 
 ### SIMPLE
@@ -48,6 +366,12 @@ CREATE TABLE keshipelicula(
         CONSTRAINT dept_deptno_pk PRIMARY KEY (deptno)
     );
 ```
+
+- Les sentències SQL que usarem són:
+
+	+ CREATE (crea)
+	+ DROP (esborra)
+	+ ALTER (modifica)
 
 ### COMPUESTA
 ```sql
