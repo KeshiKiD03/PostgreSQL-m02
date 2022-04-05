@@ -20,13 +20,119 @@ CREATE ROLE <em class="replaceable"><code>name</code></em>;
 </p><pre class="synopsis">
 GRANT <em class="replaceable"><code>group_role</code></em> TO <em class="replaceable"><code>role1</code></em>, ... ;
 REVOKE <em class="replaceable"><code>group_role</code></em> FROM <em class="replaceable"><code>role1</code></em>, ... ;
-</pre><p>
+</pre>
+<p>SECURITY</p>
+<p>Grant into Table</p>
+</p><pre class="programlisting">
+   GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER }
+   [, ...] | ALL [ PRIVILEGES ] }
+   ON { [ TABLE ] table_name [, ...]
+        | ALL TABLES IN SCHEMA schema_name [, ...] }
+   TO { [ GROUP ] role_name | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+   </pre><p>
+<p>Grant into Column</p>
+</p><pre class="programlisting">
+   GRANT { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] )
+   [, ...] | ALL [ PRIVILEGES ] ( column_name [, ...] ) }
+   ON [ TABLE ] table_name [, ...]
+   TO { [ GROUP ] role_name | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+   </pre><p>
+<p>Grant into Database</p>
+</p><pre class="programlisting">
+   GRANT { { CREATE | CONNECT | TEMPORARY | TEMP } [, ...] | ALL [ PRIVILEGES ] }
+   ON DATABASE database_name [, ...]
+   TO { [ GROUP ] role_name | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+   </pre><p>
+<p>Grant into Schemes</p>
+</p><pre class="programlisting">
+   GRANT { { CREATE | CONNECT | TEMPORARY | TEMP } [, ...] | ALL [ PRIVILEGES ] }
+   ON DATABASE database_name [, ...]
+   TO { [ GROUP ] role_name | PUBLIC } [, ...] [ WITH GRANT OPTION ]
+   </pre><p>
+<p>Inherit grant</p>
+</p><pre class="programlisting">
+   GRANT rol_pare [, ...] TO rol_fill [, ...]
+   </pre><p>
+<p>
    You can grant membership to other group roles, too (since there isn't
    really any distinction between group roles and non-group roles).  The
    database will not let you set up circular membership loops.  Also,
    it is not permitted to grant membership in a role to
    <code class="literal">PUBLIC</code>.
-  </p><p>
+  </p>
+  <p>
+   Ejemplo (Permisos de una BD al usuario tmanager y al usuario tadmin): OWNER
+
+   CREATE ROLE tgroup;
+   ALTER DATABASE training OWNER TO tmanager;
+   ALTER TABLE clientes OWNER TO tmanager;
+   ALTER TABLE oficinas OWNER TO tmanager;
+   ALTER TABLE repventas OWNER TO tmanager;
+   ALTER TABLE productos OWNER TO tmanager;
+   ALTER TABLE pedidos OWNER TO tmana   
+  </p>
+  <p>REVOKE → QUITAR PRIVILEGIOS</p>
+  <p>Revoke into Table</p>
+</p><pre class="programlisting">
+   REVOKE [ GRANT OPTION FOR ]
+   { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER }
+   [, ...] | ALL [ PRIVILEGES ] }
+   ON { [ TABLE ] table_name [, ...]
+        | ALL TABLES IN SCHEMA schema_name [, ...] }
+   FROM { [ GROUP ] role_name | PUBLIC } [, ...]
+   [ CASCADE | RESTRICT ]
+   </pre><p>
+<p>Grant into Column</p>
+</p><pre class="programlisting">
+   REVOKE [ GRANT OPTION FOR ]
+   { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] )
+   [, ...] | ALL [ PRIVILEGES ] ( column_name [, ...] ) }
+   ON [ TABLE ] table_name [, ...]
+   FROM { [ GROUP ] role_name | PUBLIC } [, ...]
+   [ CASCADE | RESTRICT ]
+   </pre><p>
+<p>Grant into Database</p>
+</p><pre class="programlisting">
+   REVOKE [ GRANT OPTION FOR ]
+   { { CREATE | CONNECT | TEMPORARY | TEMP } [, ...] | ALL [ PRIVILEGES ] }
+   ON DATABASE database_name [, ...]
+   FROM { [ GROUP ] role_name | PUBLIC } [, ...]
+   [ CASCADE | RESTRICT ]
+   </pre><p>
+<p>Grant into Schemes</p>
+</p><pre class="programlisting">
+   REVOKE [ GRANT OPTION FOR ]
+   { { CREATE | USAGE } [, ...] | ALL [ PRIVILEGES ] }
+   ON SCHEMA schema_name [, ...]
+   FROM { [ GROUP ] role_name | PUBLIC } [, ...]
+   [ CASCADE | RESTRICT ]
+   </pre><p>
+<p>Inherit grant</p>
+<p>CAMBIAR PROPIETARIO DE UNA DB: ALTER DATABASE db_name OWNER TO username; 
+   CAMBIAR PROPIETARIO DE UNA TABLA: ALTER TABLE table_name OWNER TO username;
+   
+   \dp → Ver privilegios o \dp tabla</p>
+<p>
+<p>
+   You can grant membership to other group roles, too (since there isn't
+   really any distinction between group roles and non-group roles).  The
+   database will not let you set up circular membership loops.  Also,
+   it is not permitted to grant membership in a role to
+   <code class="literal">PUBLIC</code>.
+  </p>
+  <p>Schemes</p>
+  <p>SCHEMAS → Permiten agrupar tablas dentro de una base de datos y tener más seguridad y consistencia.
+   \dn → Ver los esquemas
+   \? → Ayuda postgres
+   
+   SCHEMA PUBLIC → Subcontenedor - Agrupa tablas dentro de una BD. Se pueden crear más esquemas.
+   
+   SELECT session_user, current_user; → PARA VER EL USUARIO ACTUAL.
+   CREATE SCHEMA keshi;
+   
+   SHOW SEARCH_PATH: → Muestra el PATH a buscar.
+   </p>
+  <p>
    The members of a group role can use the privileges of the role in two
    ways.  First, every member of a group can explicitly do
    <a class="xref" href="sql-set-role.html" title="SET ROLE"><span class="refentrytitle">SET ROLE</span></a> to
@@ -100,6 +206,121 @@ RESET ROLE;
   </p><p>
    To destroy a group role, use <a class="xref" href="sql-droprole.html" title="DROP ROLE"><span class="refentrytitle">DROP ROLE</span></a>:
 </p><pre class="synopsis">
+DROP ROLE <em class="replaceable"><code>name</code></em>;
+</pre><p>
+   Any memberships in the group role are automatically revoked (but the
+   member roles are not otherwise affected).
+   <p>
+      The role attributes <code class="literal">LOGIN</code>, <code class="literal">SUPERUSER</code>,
+      <code class="literal">CREATEDB</code>, and <code class="literal">CREATEROLE</code> can be thought of as
+      special privileges, but they are never inherited as ordinary privileges
+      on database objects are.  You must actually <code class="command">SET ROLE</code> to a
+      specific role having one of these attributes in order to make use of
+      the attribute.  Continuing the above example, we might choose to
+      grant <code class="literal">CREATEDB</code> and <code class="literal">CREATEROLE</code> to the
+      <code class="literal">admin</code> role.  Then a session connecting as role <code class="literal">joe</code>
+      would not have these privileges immediately, only after doing
+      <code class="command">SET ROLE admin</code>.
+     </p><p>
+     </p><p>
+      To destroy a group role, use <a class="xref" href="sql-droprole.html" title="DROP ROLE"><span class="refentrytitle">DROP ROLE</span></a>:
+   </p><pre class="synopsis">
+   DROP ROLE <em class="replaceable"><code>name</code></em>;
+   </pre><p>
+      Any memberships in the group role are automatically revoked (but the
+      member roles are not otherwise affected).
+   <p>
+   The role attributes <code class="literal">LOGIN</code>, <code class="literal">SUPERUSER</code>,
+   <code class="literal">CREATEDB</code>, and <code class="literal">CREATEROLE</code> can be thought of as
+   special privileges, but they are never inherited as ordinary privileges
+   on database objects are.  You must actually <code class="command">SET ROLE</code> to a
+   specific role having one of these attributes in order to make use of
+   the attribute.  Continuing the above example, we might choose to
+   grant <code class="literal">CREATEDB</code> and <code class="literal">CREATEROLE</code> to the
+   <code class="literal">admin</code> role.  Then a session connecting as role <code class="literal">joe</code>
+   would not have these privileges immediately, only after doing
+   <code class="command">SET ROLE admin</code>.
+  </p><p>
+  </p><p>
+   To destroy a group role, use <a class="xref" href="sql-droprole.html" title="DROP ROLE"><span class="refentrytitle">DROP ROLE</span></a>:
+</p><pre class="synopsis">
+DROP ROLE <em class="replaceable"><code>name</code></em>;
+</pre>
+<p>
+   Permite al Administrador del Gestor de Base de Datos, el acceso a los ojbetos. Podemos: otorgar o denegar permisos a uno o más roles para hacer determinadas tareas. Los comandos son GRANT - REVOKE.
+
+CREACIÓN USUARIOS
+postgres@keshi:~$ createuser –interactive (Desde fuera) → Permite crear de forma interactiva un usuario, desde fuera
+postgres@keshi:~$ sudo -u postgres createuser –interactive
+postgres@keshi:~$ sudo -u postgres createdb keshi → Crea la BD desde fuera.
+</p>
+<p>
+   \du → Lista roles existentes
+
+CREATE ROLE nom_user LOGIN; → Sin password // CREATE ROLE nom_rol WITH LOGIN PASSWORD ‘password’; → C on password (No tiene LOGIN por defecto)
+CREATE USER nom_user PASSWORD ‘password’; (Tiene LOGIN por defecto)
+
+</p>
+<p>
+   OPCIONES: SUPERUSER / NOSUPERUSER - CREATEDB / NOCREATEDB - CREATEROLE / NOCREATEROLE - INHERIT / NOINHERIT - LOGIN / NOLOGIN - PASSWORD - CONNECTION LIMIT num - VALID UNTIL ‘timestamp’ - IN ROLE role_name (Tendrá sus privilegios)
+</p>
+<p>
+   Borrar un usuario (DROP) o modificar (ALTER): DROP USER user. ALTER USER user WITH CREATEROLE;
+   Para ver a que usuario y role estás trabajando → SELECT session_user current_user;
+   Volver al role normal → RESET ROLE role;
+   Cambiar de role en concreto → SET ROLE role;
+   ACCESO: $ psql -h ip_servidor | nom_servidor -U nom_usuari nom_bd
+</p>
+<p>
+   Any memberships in the group role are automatically revoked (but the
+   member roles are not otherwise affected).
+
+   <p>
+      PERMISOS (Grant / Revoke)
+   </p>
+   <p>
+      GRANT→ AÑADIR PRIVILEGIOS
+      \dp → Ver permisos
+
+      Ejemplo:
+      GRANT SELECT, INSERT, DELETE ON repventas TO rrhh; → Se le concede DML i Select.
+      GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tworker; → Se concede todos los privilegios de todas las tablas en public. a tworker.
+   </p>
+   <p>
+      The role attributes <code class="literal">LOGIN</code>, <code class="literal">SUPERUSER</code>,
+      <code class="literal">CREATEDB</code>, and <code class="literal">CREATEROLE</code> can be thought of as
+      special privileges, but they are never inherited as ordinary privileges
+      on database objects are.  You must actually <code class="command">SET ROLE</code> to a
+      specific role having one of these attributes in order to make use of
+      the attribute.  Continuing the above example, we might choose to
+      grant <code class="literal">CREATEDB</code> and <code class="literal">CREATEROLE</code> to the
+      <code class="literal">admin</code> role.  Then a session connecting as role <code class="literal">joe</code>
+      would not have these privileges immediately, only after doing
+      <code class="command">SET ROLE admin</code>.
+     </p><p>
+     </p><p>
+      To destroy a group role, use <a class="xref" href="sql-droprole.html" title="DROP ROLE"><span class="refentrytitle">DROP ROLE</span></a>:
+   </p><pre class="synopsis">
+   DROP ROLE <em class="replaceable"><code>name</code></em>;
+   </pre><p>
+      Any memberships in the group role are automatically revoked (but the
+      member roles are not otherwise affected).
+<p>
+   The role attributes <code class="literal">LOGIN</code>, <code class="literal">SUPERUSER</code>,
+   <code class="literal">CREATEDB</code>, and <code class="literal">CREATEROLE</code> can be thought of as
+   special privileges, but they are never inherited as ordinary privileges
+   on database objects are.  You must actually <code class="command">SET ROLE</code> to a
+   specific role having one of these attributes in order to make use of
+   the attribute.  Continuing the above example, we might choose to
+   grant <code class="literal">CREATEDB</code> and <code class="literal">CREATEROLE</code> to the
+   <code class="literal">admin</code> role.  Then a session connecting as role <code class="literal">joe</code>
+   would not have these privileges immediately, only after doing
+   <code class="command">SET ROLE admin</code>.
+  </p><p>
+  </p><p>
+   To destroy a group role, use <a class="xref" href="sql-droprole.html" title="DROP ROLE"><span class="refentrytitle">DROP ROLE</span></a>:
+</p>
+<pre class="synopsis">
 DROP ROLE <em class="replaceable"><code>name</code></em>;
 </pre><p>
    Any memberships in the group role are automatically revoked (but the
