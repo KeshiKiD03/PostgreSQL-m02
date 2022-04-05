@@ -532,6 +532,15 @@ COMMIT; -- Connexió 1
 SELECT valor 
   FROM punts 
  WHERE id = 111; -- Connexió 0
+ 
+ -- Resultado
+ 
+  valor 
+-------
+     7
+(1 row)
+
+ 
 ```
 
 ```
@@ -574,11 +583,15 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint en
 compte que cada sentència s'executa en una connexió determinada.
 
-```
+```sql
+
+-- Insert 
 INSERT INTO punts (id, valor)
 VALUES (120,5); -- Connexió 0
 INSERT INTO punts (id, valor) 
 VALUES (121,5); -- Connexió 0
+
+ -- Abre Transacción - Realiza el update OK de 121 a 6 - Crea Savepoint A - Realiza otro update a otro campo de 120. Pêndiente de COMMIT o ROLLBACK;
 
 BEGIN; -- Connexió 1
 UPDATE punts
@@ -588,19 +601,35 @@ SAVEPOINT a;
 UPDATE punts
    SET valor = 9
  WHERE id = 120; -- Connexió 1
+ 
+ -- Inicia Transacción - Realiza el UPDATE pero se queda esperando ya que hay un bloqueo de ROW por parte de Conexión 1
+ 
 
 BEGIN; -- Connexió 2
 UPDATE punts 
    SET valor = 7
  WHERE id = 120; -- Connexió 2
 
+-- Se queda colgado aquí, esperando a que Conexión 1 libere id = 120
+
 ROLLBACK TO a; -- Connexió 1
 
+-- Libera la espera de CONEXIÓN 2 ya que ha hecho un ROLLBACK a un savepoint a;
+
 SAVEPOINT a; -- Connexió 2
+
+-- Este sigue en la conexión
+
 UPDATE punts
    SET valor = 8
  WHERE id = 120; -- Connexió 2
+ 
+ -- Update OK ya que no hay nadie bloqueandola.
+ 
 ROLLBACK TO a; -- Connexió 2
+
+-- Se omite el UPDATE anterior ya que hicimos un ROLLBACK TO a;
+
 COMMIT; -- Connexió 2
 
 COMMIT; -- Connexió 1
@@ -608,6 +637,15 @@ COMMIT; -- Connexió 1
 SELECT valor
   FROM punts
  WHERE id = 121; -- Connexió 0
+ 
+ -- Solución:
+ 
+  valor 
+-------
+     6
+(1 row)
+
+ 
 ```
 
 ```
