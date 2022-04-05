@@ -1,17 +1,28 @@
 # Accés i permisos
 
+1. Editar el fichero ``pg_hba.conf`` y luego el ``postgresql.conf`` en ``/etc/postgresql/13/main/pg_hba.conf``
+
+2. Reiniciar Postgresql.
+
+3. Acceder como POSTGRESQL (ROOT)
+
+4. Crear un usuario igual al suyo de inicio. CREATE USER nombre WITH PASSWORD 'user' CREATEDB;
+
+5. Aceder desde el _Cliente_.
 
 ## Exercici 1
 
 Explica quina configuració ha de tenir el postgresql i quines sentències s'han
-d'executar per permetre la connexió des de qualsevol ordinador de l'aula i que
-un company des del seu ordinador pugui accedir al postgresql del teu ordinador
-usant varis usuaris amb les seves contrasenya emmagatzemades al postgresql.
+d'executar per permetre la connexió des de *qualsevol ordinador* de l'aula i que
+un company des del seu **ordinador** pugui accedir al postgresql del teu ordinador
+usant varis usuaris amb les seves **contrasenya emmagatzemades** al **postgresql**.
 Explica com comprovar el correcte funcionament.
 
 **Solució:**
 
 Suposem que estem a una aula `10.200.244.0/24`
+
+``Keshi: 172.18.0.0/16 - Docker``
 
 + Costat servidor. Com a _root_.
 
@@ -44,6 +55,11 @@ Suposem que estem a una aula `10.200.244.0/24`
 	CREATE USER julio WITH PASSWORD 'passwordsuperbo' CREATEDB;
 	```
 
+	```
+	psql template1
+	CREATE USER julio WITH PASSWORD 'passwordsuperbo' CREATEDB; -- Con permisos para crear BD
+	```
+
 + Costat client.
 
 	Accedim amb el nostre usuari:
@@ -52,15 +68,24 @@ Suposem que estem a una aula `10.200.244.0/24`
 	psql -h ip_servidor -U julio template1
 	```
 
+	```
+	psql -h 172.18.0.3 -U aaron template1
+	```
+
+	`ÀCCESO OK D1`
+
 ## Exercici 2
 
 Explica quina configuració ha de tenir el postgresql i quines sentències s'han
-executat per tal que cap usuari es pugui connectar a cap base de dades des d'un
-ordinador concret de l'aula, però s'ha d'acceptar connexions des de tots els
-altres ordinadors de l'aula. Explica com comprovar el correcte funcionament.
+executat per tal que ``cap usuari`` es ``pugui connectar`` a ``cap base de dades`` des d'un ordinador`` concret de l'aula``, però s'ha d'acceptar connexions des de tots els altres ``ordinadors`` de ``l'aula``. Explica com comprovar el correcte funcionament.
 
 **Solució:**
 
+1. Un PC es IP/32.
+
+2. Modificamos pg_hba.conf con un `reject` a un ordenador.
+
+3. __IMPORTANTE --> `EL ORDEN IMPORTA`__ - Acceder desde un ordenador.
 
 Suposem que no volem connexions des de `192.168.1.224`
 
@@ -69,8 +94,15 @@ Suposem que no volem connexions des de `192.168.1.224`
 	Editem el fitxer `/etc/postgresql/13/main/pg_hba.conf` afegint les línies:
 	
 	```
+	# Orden matters
+	# Reject a todos los usuarios y bases de datos desde un PC pero permites al resto de su red
 	host    all        all             192.168.1.224/32   reject
 	host    all        all             192.168.1.0/24	 md5
+	```
+
+	```
+	host    all        all             172.18.0.2/32   reject
+	host    all        all             172.18.0.0/16	 md5
 	```
 
 	Editem el fitxer `/etc/postgresql/13/main/postgresql.conf` i modifiquem la línia:
@@ -124,12 +156,34 @@ Suposem que no volem connexions des de `192.168.1.224`
 ## Exercici 3
 
 Explica quina configuració ha de tenir el postgresql i quines sentències s'han
-executat per tal que un usuari anomenat "con_rem" només pugui accedir a la base de
-dades amb el mateix nom des d'un ordinador concret de l'aula sense usar contrasenya.
-No s'ha de permetre la connexió amb aquest usuari des d'altres ordinadors, però si
-amb altres usuaris. Explica com comprovar el correcte funcionament.
+executat per tal que un usuari anomenat __"con_rem"__ només pugui accedir a la base de dades amb el __mateix nom__ des d'un ordinador concret de __l'aula sense usar contrasenya__.
+
+``No s'ha de permetre`` la connexió ``amb aquest usuari`` des d'altres ordinadors, però si amb ``altres usuaris``. Explica com comprovar el correcte funcionament.
 
 **Solució:**
+
+1. 1ª línea: TYPE: host DB: con_rem USER: con_rem ADD: ip_con_rem METHOD: trust
+
+* Trust: **SIN PASSWORD**
+
+## Permite a con_rem acceder a su BD desde ese ordenador solo y sin password
+
+2. 2ª línea: TYPE: host DB: con_rem USER: con_rem ADD: 0.0.0.0/0 METHOD: reject
+
+* ALL HOST: 0.0.0.0/0
+
+* Same que el de antes pero 0.0.0.0/0 rejec --> No podrá acceder desde otro PC
+
+## No permite acceder a con_rem a su BD con_rem desde otro ordenador
+
+
+3. 3ª línea: TYPE: host DB: con_rem USER: con_rem ADD: 0.0.0.0/0 METHOD: reject
+
+* ALL HOST: 0.0.0.0/0
+
+4. Si los usuarios no existen en la BD, hay que crearlos con un ``CREATE USER`` --> ``TIENE LOGIN`` y luego un ``CREATE DB`` de la misma.
+
+## Cualquier otro usuario puede acceder a la BD con_rem
 
 Suposem que l'ordinador concret és `192.168.0.23`
 
@@ -138,8 +192,16 @@ Suposem que l'ordinador concret és `192.168.0.23`
 	Editem el fitxer `/etc/postgresql/13/main/pg_hba.conf` afegint les línies:
 
 	```
-	host    con_rem     con_rem          192.168.0.23/32   trust
+
+	# Permite a con_rem acceder a su BD desde ese ordenador solo y sin password
+
+	host    con_rem     con_rem          172.18.0.2/32   trust
+	
+	# No permite acceder a con_rem a su BD con_rem desde otro ordenador
+
 	host    con_rem     con_rem          0.0.0.0/0		 reject
+
+	# Cualquier otro usuario puede acceder a la BD con_rem
 	host    con_rem     all             0.0.0.0/0		 trust
 	```
 	
@@ -169,17 +231,24 @@ Suposem que l'ordinador concret és `192.168.0.23`
 
 + Costat client.
 
+	Des de `172.18.0.2`:
+	```
+	psql -h ip_servidor -U con_rem con_rem
+	```
+
 	Des de `192.168.0.23`:
 	```
 	psql -h ip_servidor -U con_rem con_rem
 	```
+
+
 	Ens deixa entrar
 	```
 	psql -h ip_servidor -U otheruser con_rem
 	```
 	Ens deixa entrar
 
-	Des d'una màquina diferent a `192.168.0.23`:
+	Des d'una màquina diferent a `172.18.0.2`:
 	```
 	psql -h ip_servidor -U con_rem con_rem
 	```
@@ -194,11 +263,11 @@ Suposem que l'ordinador concret és `192.168.0.23`
 ## Exercici 4
 
 Explica quina configuració ha de tenir el postgresql i quines sentències s'han
-executat per tal que un usuari pugui accedir a totes les bases de dades amb
-poders absoluts des d'un ordinador en concret. No s'ha de permetre la connexió
-amb aquest usuari des d'altres ordinadors, però si amb altres usuaris. L'usuari
-s'ha d'anomenar "rem_admin" i la contrasenya emmagatzemada al postgresql ha de
-ser "ra". Explica com comprovar el correcte funcionament.
+executat per tal que un __usuari pugui accedir__ a __totes les bases de dades__ amb __poders absoluts__ (``SUPERUSER``) des d'un ordinador en concret. 
+
+No __s'ha de permetre__ __la connexió__ amb aquest usuari des d'altres ordinadors, però si amb altres usuaris. 
+
+L'usuari s'ha d'anomenar "``rem_admin``" i la contrasenya emmagatzemada al postgresql ha de ser "``ra``". Explica com comprovar el correcte funcionament.
 
 
 **Solució:**
@@ -211,8 +280,15 @@ Suposant que l'ordinador concret és 192.168.0.23
 	Editem el fitxer `/etc/postgresql/13/main/pg_hba.conf` afegint les línies:
 
 	```
+	# rem_admin puede entrar a todas las BD desde su PC con password Md5
+
 	host    all		rem_admin	192.168.0.23/32 md5
+	
+	# rem_admin no puede entrar desde otro ORDENADOR.
+
 	host    all		rem_admin	0.0.0.0/0		reject
+
+	# Otros usuarios si pueden entrar
 	host	all		all			0.0.0.0/0		trust
 	```
 	
@@ -271,12 +347,42 @@ Suposant que l'ordinador concret és 192.168.0.23
 ## Exercici 5
 
 Explica quina configuració ha de tenir el postgresql i quines sentències s'han
-executat per tal que un usuari pugui accedir a totes les bases de dades des de
-qualsevol ordinador de l'aula. L'usuari s'ha d'anomenar "semi_admin" i la
-contrasenya, emmagatzemada al postgresql, ha de ser "sa". Aquest usuari ha de
-tenir permisos per a poder crear bases de dades i nous usuaris. Explica com
-comprovar el correcte funcionament.
+executat per tal que un __usuari__ pugui __accedir__ a __totes__ les bases de dades des de __qualsevol ordinador__ de l'aula. 
 
+L'usuari s'ha d'anomenar "semi_admin" i la
+contrasenya, emmagatzemada al postgresql, ha de ser "sa". Aquest usuari ha de
+tenir permisos per a poder __crear bases de dades__ i __nous usuaris__. Explica com comprovar el correcte funcionament.
+
+Keshi:
+
+* Server:
+
+pg_hba.conf:
+```
+host 		all			semi_admin		172.18.0.2/16		md5
+```
+
+postgresql.conf
+```
+listen_addresses='*'
+```
+
+```
+su -l postgres ; psql template1
+```
+
+```sql
+CREATE USER semi_admin WITH PASSWORD 'sa' CREATEDB CREATEROLE;
+```
+
+\du --> Revisar
+
+
+* Cliente:
+
+```
+psql -h 172.18.0.2 -U semi_admin template1;
+```
 
 
 + Costat servidor
@@ -330,9 +436,25 @@ comprovar el correcte funcionament.
 Explica quina configuració ha de tenir el postgresql i quines sentències s'han
 executat per tal que un usuari només pugui accedir a la base de dades "db123"
 des de qualsevol ordinador. L'usuari s'ha d'anomenar "us123" i la contrasenya,
-emmagatzemada al postgresql, ha de ser "123". L'usuari només pot tenir 2
-connexions simultànies i només s'ha de poder connectar fins el 31-12-2022,
-inclòs. Explica com comprovar el correcte funcionament.
+emmagatzemada al postgresql, ha de ser "123". 
+
+L'usuari només pot tenir 2 connexions simultànies i només s'ha de poder connectar fins el 31-12-2022, inclòs. Explica com comprovar el correcte funcionament.
+
+
+pg_hba.conf
+
+```
+host 	db123		us123		172.16.0.0/16		md5
+```
+
+editar el fichero postgresql.conf
+
+reiniciar
+
+iniciar como postgres
+
+crear el usuario --> CREATE USER db123 WITH PASSWORD '123' CONNECTION LIMIT 2 VALID UNTIL '2022-12-31'
+
 
 
 + Costat servidor
@@ -489,8 +611,7 @@ sistema gestor de base de dades. Explica com comprovar el correcte funcionament.
 ## Exercici 9
 
 Explica quines sentències s'han d'executar per tal que un usuari anomenat
-"lectura" no pugui modificar les dades ni l'estructura de la base de dades "training"
-propietat del vostre usuari. La contrasenya de l'usuari s'ha d'emmagatzemar al
+"lectura" no pugui modificar les dades ni l'estructura de la base de dades "training" propietat del vostre usuari. La contrasenya de l'usuari s'ha d'emmagatzemar al
 sistema gestor de base de dades. Explica com comprovar el correcte funcionament.
 
 + Costat servidor

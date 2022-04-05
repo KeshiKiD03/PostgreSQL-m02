@@ -468,6 +468,134 @@ host    all             all             192.168.54.1/32         reject
 
 # Cualquiera es 0.0.0.0/0
 
+#1. Editar el fichero ``pg_hba.conf`` y luego el ``postgresql.conf`` en ``/etc/postgresql/13/main/pg_hba.conf``
+
+#2. Reiniciar Postgresql.
+
+#3. Acceder como POSTGRESQL (ROOT)
+
+#4. Crear un usuario igual al suyo de inicio. CREATE USER nombre WITH PASSWORD 'user' CREATEDB;
+
+#5. Aceder desde el _Cliente_.
+
+# 1 - Access ALL Ok with md5
+
+host    all        all             10.200.244.0/24        md5
+
+# 	CREATE USER password WITH PASSWORD 'password' CREATEDB;
+
+# psql -h 172.18.0.3 -U aaron template1
+
+# 2 - Reject access to 1 pc and permit all
+
+# Orden matters
+# Reject a todos los usuarios y bases de datos desde un PC pero permites al resto de su red
+
+host    all        all             172.18.0.2/32   reject
+host    all        all             172.18.0.0/16	 md5
+
+# 3 - With one psql "user"  only access to db with his name, only 1 pc 
+
+# Permite a con_rem acceder a su BD desde ese ordenador solo y sin password
+
+host    con_rem     con_rem          172.18.0.2/32   trust
+
+# No permite acceder a con_rem a su BD con_rem desde otro ordenador
+
+host    con_rem     con_rem          0.0.0.0/0		 reject
+
+# Cualquier otro usuario puede acceder a la BD con_rem
+host    con_rem     all             0.0.0.0/0		 trust
+
+# 	CREATE USER con_rem;
+# CREATE USER otheruser;
+# CREATE DATABASE con_rem;
+
+# 4 - A superuser (Create later with CREATE USER or CREATE ROLE) access in 1 pc - Reject this user to other pc - But ok with other users.
+
+# rem_admin puede entrar a todas las BD desde su PC con password Md5
+
+host    all		rem_admin	192.168.0.23/32 md5
+
+# rem_admin no puede entrar desde otro ORDENADOR.
+
+host    all		rem_admin	0.0.0.0/0		reject
+
+# Otros usuarios si pueden entrar
+host	all		all			0.0.0.0/0		trust
+
+# CREATE USER rem_admin SUPERUSER PASSWORD 'ra';
+# CREATE USER other_user;
+
+# Client - psql -h ip_servidor -U rem_admin training || psql -h ip_servidor -U otheruser training ||
+# Other machine - psql -h ip_servidor -U rem_admin training - Error
+
+# Superuser has full power - 	DROP DATABASE training; CREATE DATABASE training;
+
+# 5 - User semi admin can acceso to all database - only his pc - with md5 / This user has createdb and create role
+
+host 		all			semi_admin		172.18.0.2/16		md5
+
+# CREATE USER semi_admin WITH PASSWORD 'sa' CREATEDB CREATEROLE;
+
+# 6 - Limit 2 connections - Network - database - db123 and user us123 
+# Creación de usuario limitado a 2 conexiones simultaneas y válido hasta 
+
+# CREATE USER db123 WITH PASSWORD '123' CONNECTION LIMIT 2 VALID UNTIL '2022-12-31'
+
+# 7 - User can only modify data from column "estoc" - from "prods" - DB - ownter to "my user".
+
+# Localhost via tcp/ip and a user magatzem can access to training and only can update 1 column (grant update) / 
+# Solo puede modificar una columna
+
+host    training	magatzem	127.0.0.1/32	md5
+
+# 	CREATE USER magatzem PASSWORD 'magatzempw';
+# GRANT UPDATE (estoc) ON productes TO magatzem;
+
+# 8 - User can only a update table rep_vendes / Solo puede editar una tabla no borrar ni select ni insert
+
+host		all		all    127.0.0.1/32		md5
+
+# psql -h localhost -U rrhh training
+# UPDATE rep_vendes SET cuota = 300000, ventas=500000;
+
+# 	CREATE USER rrhh PASSWORD 'rrhhpw';
+# GRANT UPDATE ON rep_vendes TO rrhh;
+
+# 9 - un usuari anomenat "lectura"
+#  no pugui modificar les dades ni l'estructura (GRANT SELECT ON ALL TABLES IN SCHEMA public TO lectura) 
+# de la base de dades "training" 
+# propietat del vostre usuari (OWNTER TO).
+
+host		all		all    127.0.0.1/32		md5
+
+# 	CREATE USER lectura PASSWORD 'lecturapw';
+# GRANT SELECT ON ALL TABLES IN SCHEMA public TO lectura;
+
+# 10 - Gestor - Puede modificar los datos y la estructura
+
+# "gestor" pueda modificar los datos y la estructura de la base de datos training
+# propiedad de su usuario. 
+# La contraseña del usuario debe almacenarse en el
+# sistema gestor de base de datos. 
+# Este usuario no puede tener permisos de
+# superusuario. Explica cómo comprobar el correcto funcionamiento.
+
+# CREATE USER gestor PASSWORD 'gestorpw';
+# CREATE ROLE training_group;
+# ALTER TABLE clients OWNER TO training_group;
+# ALTER TABLE rep_vendes OWNER TO training_group;
+# ALTER TABLE comandes OWNER TO training_group;
+# ALTER TABLE productes OWNER TO training_group;
+# ALTER TABLE oficines OWNER TO training_group;
+# GRANT training_group TO isx36579183, gestor;
+
+# CLIENTE psql -U gestor -h 127.0.0.1 training
+
+
+
+
 # If these are the only three lines for local connections, they will
 # allow local users to connect only to their own databases (databases
 # with the same name as their database user name) except for administrators
@@ -485,6 +613,156 @@ local   all             @admins,+support                        md5
 
 # The database column can also use lists and file names:
 local   db1,db2,@demodbs  all                                   md5
+
+
+# 11
+
++ Los nombres asignados deben ser descriptivos.
+
++ Una base de datos de una empresa de transporte que tiene una tabla para
+  almacenar los vehículos con los siguientes campos:
+
+- Campo que identifica el vehículo.
+
+- Campo que indica la fecha de compra del vehículo.
+
+- Campo que indica si el vehículo está disponible o por algún motivo está
+en el taller, cuando se añade un nuevo vehículo a la mesa este campo debe decir
+que el vehículo está disponible.
+
++ Los usuarios guardan sus contraseñas en el postgresql.
+
++ El usuario administrador:
+
+- Debe ser un superusuario del postgresql
+
+- Sólo tiene que poder conectarse desde un ordenador concreto.
+
++ El usuario del taller:
+
+- Sólo debe poder modificar los datos referentes al estado del vehículo.
+
+- Sólo tiene que poder conectarse desde un ordenador en concreto.
+
++ El usuario de compras:
+
+- Tiene que poder añadir vehículos a la mesa de los vehículos, pero no debe poder
+modificar los datos referentes al estado del vehículo.
+
+- Sólo tiene que poder conectarse desde la red local.
+
++ Explica cómo comprobar el correcto funcionamiento.
+
+**Solución:**
+
+
+Supondremos que el usuario administrador y el usuario del taller sólo se pueden
+conectar desde los hosts `192.168.0.23` y `192.168.0.24` respectivamente.
+
++ Lado servidor
+
+Editamos el archivo `/etc/postgresql/13/main/pg_hba.conf` añadiendo las líneas:
+
+
+host transporte admin 192.168.0.23/32 md5
+host transporte garaje 192.168.0.24/32 md5
+host transporte salas 192.168.0.0/24 md5
+
+
+Editamos el archivo `/etc/postgresql/13/main/postgresql.conf` y modificamos la línea:
+
+
+listen_addresses='*'
+
+
+Reiniciamos el servicio postgresql para que vuelva a leer los archivos de configuración:
+
+
+systemctl restart postgresql
+
+
+Continuamos al lado servidor, cambiamos a usuario administrador de la base de datos, potsgres.
+
+
+su -l postgres
+
+
+Nos conectamos a la base de datos `template1` y creamos la base de datos
+`transporte` y nos conectamos a esta:
+
+
+psql template1
+CREATE DATABASE transporte;
+\c transporte
+
+
+Y ahora creamos la mesa vehículos:
+
+
+CREATE TABLE vehículos (
+PRIMARY KEY(id_vehicle),
+id_vehicle VARCHAR(10),
+sale_date DATE,
+available BOOLEAN DEFAULT true
+);
+
+
+Creamos los usuarios admin, garage y salas con sus respectivos permisos.
+
+
+CREATE USER admin SUPERUSER PASSWORD 'adminpw';
+CREATE USER garage PASSWORD 'garagepw';
+CREATE USER salas PASSWORD 'salespw';
+GRANT SELECT(id_vehicle), UPDATE (available) DONDE vehículos TO garage;
+GRANT INSERT DONDE vehículos TO salas;
+
+
++ Lado cliente.
+
+Desde aquí haremos las **comprobaciones** pertinentes:
+
++ Desde 192.168.0.23, el usuario admin:
+
+
+psql -U admin -h ip_server
+SELECT *
+FROM vehículos;
+INSERT INTO vehículos
+VALUES ('aaa','2022-02-18');
+INSERT INTO vehículos
+VALUES ('bbb','2022-02-18');
+
+
++ Desde 192.168.0.24, el usuario garage:
+
+
+psql -U garage -h ip_server
+SELECT *
+FROM vehículos;
+
+**error**
+
+
+INSERT INTO vehículos
+VALUAS ('ccc','2022-03-16');
+
+**error**
+
+
+UPDATE vehículos
+SET available = false;
+
++ Desde cualquier orientador de la red, el usuario salas:
+
+
+psql -U salas -h ip_server
+INSERT INTO vehículos
+VALUAS ('ccc','2022-03-17');
+
+
++ Comprobar que no se puede hacer desde los ordenadores prohibidos.
+
+
 </pre></div></div>
 <p>
    Per fer accessos remots, hem de dir a Postgresql que escolti a les adreces de xarxa que volem en el fitxer /etc/postgresql/13/main/postgresql.conf:
