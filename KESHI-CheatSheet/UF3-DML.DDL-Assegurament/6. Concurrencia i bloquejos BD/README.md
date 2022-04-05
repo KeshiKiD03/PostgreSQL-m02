@@ -16,17 +16,11 @@ Quan diversos usuaris/processos ataquen una base de dades podem tenir problemes 
 Creem la base de dades _sandbox_, la taula _toys_ i afegim  un _cotxet_, una _excavadora_ i una _pala_.
 
 ```SQL
-
 -- Creem la DB
-
 CREATE DATABASE sandbox;
-
 -- Ens conectem a la sandbox
-
 \c sandbox
-
 -- Creem la taula de TOYS
-
 CREATE TABLE toys (
 	PRIMARY KEY(id),
 	id      SERIAL          NOT NULL,   -- identificador de la joguina
@@ -34,10 +28,8 @@ CREATE TABLE toys (
 	usage   INTEGER         NOT NULL
 	                        DEFAULT 0   -- número de cops que s'ha usat
 );
-
 INSERT INTO toys (name)
 VALUES ('car'), ('digger'), ('shovel');
-
 \q
 ```
 
@@ -178,9 +170,7 @@ Bob encara veu les dades antigues, perquè Alice no ha fet el COMMIT:
 ```SQL
 [Bob] sandbox=> BEGIN;
 BEGIN
-
 -- Todavía ve lo antiguo ya que Alice no ha hecho COMMIT.
-
 [Bob] sandbox=> SELECT * FROM toys;
  id |  name  | usage
 ----+--------+-------
@@ -194,7 +184,6 @@ Però ara Bob també vol el cotxe!
 
 ```SQL
 [Bob] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 1;
-
 -- A partir de aquí se hace el BLOQUEO, porque usan el mismo juguete.
 ```
 
@@ -204,9 +193,7 @@ de moment no li deixa el cotxe).
 Alice decideix no jugar amb el cotxe i fa un ROLLBACK:
 
 ```SQL
-
 -- Para que Alice deje el juguete tiene que hacer un ROLLBACK o COMMIT. Este caso es ROLLBACK;
-
 [Alice] sandbox=> ROLLBACK;
 ROLLBACK
 ```
@@ -226,7 +213,6 @@ COMMIT
   3 | shovel |     1
   1 | car    |     1
 (3 rows)
-
 -- Bob ha usado el juguete.
 ```
 
@@ -249,7 +235,6 @@ jugant-hi la té bloquejada!
 ```SQL
 [Bob] sandbox=> BEGIN; UPDATE toys SET usage = usage+1 WHERE id = 2;
 BEGIN
-
 -- Aquí se queda colgada
 ```
 
@@ -300,7 +285,6 @@ Bob intenta jugar amb la pala:
 
 ```SQL
 [Bob] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 2;
-
 -- Se queda colgado a aquí
 ```
 
@@ -351,7 +335,6 @@ Alice intenta jugar amb l'excavadora, però Bob la té bloquejada. Alice es qued
 
 ```SQL
 [Alice] sandbox=> UPDATE toys SET usage = usage + 1 WHERE id = 2;
-
 -- Se queda colgado aquí
 ```
 
@@ -381,96 +364,95 @@ COMMIT
 (3 rows)
 ```
 
-
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-# Ejercicio Transacciones + Concurrencia y bloqueos
 
 # Exercicis de transaccions
 
+## Preparació del terreny de joc (setup)
+
+Sembla que haurem de construir primer una taula i per tant una base de dades.
+Som-hi:
+
+```SQL
+CREATE DATABASE transaccions_db;
+\c transaccions_db
+CREATE TABLE punts (
+	id		INTEGER	NOT NULL, -- identificador de la puntuació
+	valor	INTEGER	NOT NULL  --valor de la puntuació
+);
+```
 
 ## Exercici 1
 
 Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
-```sql
+```SQL
+-- 1
 INSERT INTO punts (id, valor)
 VALUES (10, 5);
+-- 2 
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 10;
 ROLLBACK;
+-- 3
 SELECT valor
   FROM punts
  WHERE id = 10;
 ```
 
-* Realiza un INSERT a la tabla PUNTOS y añade dos valores nuevos.
+**Solució:**
 
-* Empieza la transacción con BEGIN. Antes de ello hay un autocomit.
++ Afegeix la tupla (10, 5).
 
-* Realiza un UPDATE de la tabla PUNTOS y cambia el valor de 4 filtrando a ID = 10.
++ La modificació no es fa perquè hi ha un `ROLLBACK`.
 
-* Hace un ROLLBACK y no guardará el UPDATE y volverá atrás y saldrá de la transacción.
+KESHI: El --2 no se actualiza. Se inserta --1 y muestra --3.
 
-* Muestra el último select **SELECT**
 
-## Solución
-
-- Primer fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
-
-- A continuació començem la transacció ('BEGIN;').
-
-- Fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
-
-- Tot el que és fa abans del 'ROLLBACK;' (dins del 'BEGIN;') no és desarà, tornarà enrere i ens treurà de la transacció.
-
-- Quan fem el 'SELECT' (fora de la transacció), no ens sotirà cap valor ja que no s'ha efectuat l'update que volíem fer.
-
+```
+ valor 
+-------
+     5
+(1 row)
+```
 
 ## Exercici 2
 
-Analitzant les següents sentències explica quins canvis es realitzen i on es realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
+Analitzant les següents sentències explica quins canvis es realitzen i on es
+realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
 ```sql
+-- 1
 INSERT INTO punts (id, valor)
 VALUES (20,5);
-
+-- 2
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 20;
+-- 3 
 COMMIT;
-
 SELECT valor
   FROM punts
  WHERE id = 20;
 ```
+**Solució:**
 
++ Afegeix la tupla (20,5)
 
-* Realiza un INSERT a la tabla PUNTOS y añade dos valores nuevos.
++ Modifica la tupla (20,5) -> (20,4), es fa el COMMIT
 
-* Empieza la transacción con BEGIN. Antes de ello hay un autocomit.
+KESHI: El --1 se inserta, el --2 se modifica el valor y se guarda. Muestra el SELECT con nuevo Valor.
 
-* Realiza un UPDATE de la tabla PUNTOS y cambia el valor de 4 filtrando a ID = 10.
-
-* Se realiza un COMMIT, se guarda todo lo que hay antes (DENTRO DEL COMIT). Saca de la TRANSACCIÓN.
-
-* Muestra EL SELECT FINAL.
-
-## Solución
-
-- Primer fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
-
-- A continuació començem la transacció ('BEGIN;').
-
-- Fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
-
-- Tot el que és fa abans del 'COMMIT;' (dins del 'BEGIN;') quedarà desat i ens treurà de la transacció.
-
-- Quan fem el 'SELECT' (fora de la transacció), ens sotirà el valor pel que filtrem ja que s'ha efectuat l'update que volíem fer.
+```
+ valor
+-------
+     4
+(1 row)
+```
 
 ## Exercici 3
 
@@ -478,50 +460,40 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
 ```sql
+-- 1 Insert OK
 INSERT INTO punts (id, valor)
 VALUES (30,5);
-
+-- 2 Inicio BEGIN
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 30;
-
 SAVEPOINT a;
+-- 3 
 INSERT INTO punts (id, valor)
 VALUES (31,7);
-
-ROLLBACK;
+ROLLBACK; -- Vuelve al INICIO, especificar
+-- 4
 SELECT valor
   FROM punts
  WHERE id = 30;
 ```
 
-* Se realiza el INSERT.
-
-* Se inicializa un BEGIN y posteriormente un UPDATE y un SAVEPOINT al final.
-
-* Se vuelve a hacer otro INSERT de una fila nueva.
-
-* Hay un ROLLBACK y deshace el cambio y vuelve al BEGIN (INICIO) ya que no especifica el ROLLBACK TO (En este caso al SAVEPOINT).
-
-* Muestra 30 y 5. Ya que antes del BEGIN hay un AUTOCOMMIT.
+**Solució:**
 
 
- ## Solución
++ S'insereix la tupla (30,5).
 
-- Primer fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
++ Alerta! Es perd la actualització i la inserció perquè no es fa un `ROLLBACK
+TO` al punt _a_ sinó que es fa un `ROLLBACK` genèric i per tant es perd tot el
+que s'ha fet entre el BEGIN i el ROLLBACK.
 
-- A continuació començem la transacció ('BEGIN;').
-
-- Fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
-
-- Fem un 'checkpoint' i li assignem un alias ('SAVEPOINT a;').
-
-- Fem 'INSERT' i introduïm més valors a la taula 'punts'.
-
-- Tot el que és fa abans del 'ROLLBACK;' (dins del 'BEGIN;' i incloent el que s'ha fet abans del 'SAVEPOINT a;') no és desarà, no és desarà ja que tornarà enrere (TOT) perquè no li hem especifcat que volem eliminar els canvis fins el nostre 'SAVEPOINT', llavors, ens treurà de la transacció sense efectuar cap modificació.
-
-- Quan fem el 'SELECT' (fora de la transacció), no ens sotirà cap valor ja que no s'ha efectuat l'update que volíem fer.
+```
+ valor 
+-------
+     5
+(1 row)
+```
 
 ## Exercici 4
 
@@ -529,54 +501,50 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
 ```sql
+-- 1 Delete OK S'esborren tots els registres de la taula.
 DELETE FROM punts;
 INSERT INTO punts (id, valor)
 VALUES (40,5);
-
-# AUTOCOMIT
-
+-- 2 S'insereix la tupla (40, 5).
 BEGIN;
 UPDATE punts 
    SET valor = 4
  WHERE id = 40;
-
 SAVEPOINT a;
+-- 3
 INSERT INTO punts (id, valor)
 VALUES (41,7);
-ROLLBACK TO a;
+ROLLBACK TO a; -- S'insereix una nova tupla, però es cancel·larà aquesta acció perquè fem un `ROLLBACK TO`tornant just al punt anterior a aquesta acció.
+-- 4
 SELECT COUNT(*)
   FROM punts;
 ```
 
-* Se realiza DML de borrado
+**Solució:**
 
-* Hay un autocomit antes del BEGIN.
 
-* Se inicializa el BEGIN y sentencia DML de UPDATE.
++ S'esborren tots els registres de la taula.
 
-* Se crea un punto de guardado - SAVEPOINT.
++ S'insereix la tupla (40, 5).
 
-* El último DML de INSERT no se guarda ya que hace un ROLLBACK a SAVEPOINT A.
++ Es modifica la tupla (40, 5) -> (40, 4)
 
-* Muestra un count de punts.
++ S'insereix una nova tupla, però es cancel·larà aquesta acció perquè fem un
+`ROLLBACK TO`tornant just al punt anterior a aquesta acció.
 
-## Solución
+```
+ count 
+-------
+     1
+(1 row)
+```
 
-- Primer fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
+Fixem-nos que el prompt ens indica (amb el caràcter _*_) que encara estem a una
+transacció, de manera que hauríem d'acabar-la: COMMIT.
 
-- A continuació començem la transacció ('BEGIN;').
+Si fem `END` també l'acabarà com a COMMIT, però si fem ROLLBACK anularà tot el
+que hi havia després del BEGIN.
 
-- Fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
-
-- Fem un 'checkpoint' i li assignem un alias ('SAVEPOINT a;').
-
-- Fem 'INSERT' i introduïm més valors a la taula 'punts'.
-
-- Tot el que és fa després del 'ROLLBACK TO a;' (sense incloure el que s'ha fet abans del 'SAVEPOINT a;') no és desarà, no és desarà ja que tornarà enrere (fins el 'SAVEPOINT a;') perquè li hem especifcat que volem eliminar els canvis efecuats després del nostre 'SAVEPOINT', llavors, ens treurà de la transacció efectuant només el que s'ha fet abans del 'SAVEPOINT a;'.
-
-- Quan fem el 'SELECT' (dins de la transacció), no ens sotiràn més camps ja que no s'ha efectuat l'insert de després del 'SAVEPOINT a;'.
-
-- Per sortir de la transacció i efectuar els canvis, falta un 'COMMIT;'.
 
 ## Exercici 5
 
@@ -584,46 +552,34 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
 ```sql
+-- 1
 INSERT INTO punts (id, valor)
 VALUES (50,5);
-
-# Autocomit
-
-# A partir de aquí se hace EL DML
-
+-- 2 + La transacció no s'executa perquè hi ha una consulta amb un error.
 BEGIN;
 SELECT id, valor
  WHERE punts;
 UPDATE punts
    SET valor = 4
  WHERE id = 50;
-
 COMMIT;
-
---Se realiza el BEGIN y la sentencia DML
-
+-- 3
 SELECT valor
   FROM punts
  WHERE id = 50;
-
---El SELECT mostrará valor = 4.
-
-
 ```
 
-## Solución
+**Solució:**
 
-- Primer fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
++ Afegeix punt (50,5)
 
-- A continuació començem la transacció ('BEGIN;').
++ La transacció no s'executa perquè hi ha una consulta amb un error.
 
-- Fem un 'SELECT' sobre la taula 'punts' seleccionant dos valors en concret però en comptes de posar 'FROM <taula>', posem 'WHERE <taula>' (la sentència està mal estructurada).
-
-- Fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
-
-- Fem 'COMMIT;' però ens farà automàticament 'ROLLBACK', no desarà els canvis, tot el que hem fet no es guardarà.
-
-- Quan fem el 'SELECT' (fora de la transacció), no ens sotiràn cap valor ja que no s'han efectuat els canvis ('UPDATE').
+```
+valor
+-----
+5
+```
 
 ## Exercici 6
 
@@ -631,73 +587,45 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
 ```sql
+-- 1
 DELETE FROM punts;
 INSERT INTO punts (id, valor)
 VALUES (60,5);
-
---Autocomit
-
---Se guarda lo que hay antes de aquí
-
+-- 2
 BEGIN;
-
---Se inicia la transacciçon
-
 UPDATE punts
    SET valor = 4
  WHERE id = 60;
-
-
 SAVEPOINT a;
-
---Se crea un SAVE POINT a
-
+-- 3
 INSERT INTO punts (id, valor)
 VALUES (61,8);
-
---DML
-
 SAVEPOINT b;
-INSERT punts (id, valor)
+INSERT INTO punts (id, valor)
 VALUES (62,9);
-
 ROLLBACK TO b;
-
---Se comite el último INSERT y vuelve al SAVEPOINT b.
-
 COMMIT;
-
+-- 4
 SELECT SUM(valor)
   FROM punts;
-
-
---Muestra una suma de los valores pero omite el Savepoint B en adelante hasta el ROLLBACK.
-
 ```
 
-## Solución
+**Solució:**
 
-- Primer fem 'DELETE' a la taula 'punts' i eliminem per complert tots els valors d'aquesta.
++ Afegeix la tupla (60,5)
 
-- Ara fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
++ Modifica la tupla ((60,5) -> (60,4)
 
-- A continuació començem la transacció ('BEGIN;').
++ Afegeix la tupla (61,8)
 
-- Fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
++ No s'afegeix la tupla (62, 9) perquè es fa un ROLLBACK fins el SAVEPOINT b
 
-- Fem un 'checkpoint' i li assignem un alias ('SAVEPOINT a;').
-
-- Fem 'INSERT' i introduïm més valors a la taula 'punts'.
-
-- Fem altre 'checkpoint' i li assignem un alias ('SAVEPOINT b;').
-
-- Fem 'INSERT' i introduïm més valors a la taula 'punts'.
-
-- Tot el que és fa després del 'ROLLBACK TO b;' (sense incloure el que s'ha fet abans del 'SAVEPOINT b;') no és desarà, no és desarà ja que tornarà enrere (fins el 'SAVEPOINT b;') perquè li hem especifcat que volem eliminar els canvis efecuats després del nostre 'SAVEPOINT'.
-
-- Fem un 'COMMIT;' per efectuar els canvis.
-
-- Quan fem el 'SELECT' (fora de la transacció), no ens sotiràn més camps ja que no s'ha efectuat l'insert de després del 'SAVEPOINT a;'.
+```
+ sum 
+-----
+  12
+(1 row)
+```
 
 ## Exercici 7
 
@@ -709,33 +637,29 @@ compte que cada sentència s'executa en una connexió determinada.
 DELETE FROM punts; -- Connexió 0
 INSERT INTO punts (id, valor)
 VALUES (70,5); -- Connexió 0
-
---Bob inicia su conexión y hace DML
-
 BEGIN; -- Connexió 1
 DELETE FROM punts; -- Connexió 1
-
---Con el autocomit de antes Alice realiza DML pero hasta que no haga COMMIT o ROLLBACK no se verán los cambios
-
+-- Se queda pillado aquí
 SELECT COUNT(*) 
   FROM punts; -- Connexió 2
-
---Tanjiro - Este último mostrará sólo la de la conexión 0 , no la 1.
-
 ```
 
-## Solución
+C0: 
++ Esborra totes les tuples de la taula punts.
++ Afegeix la tupla (70,5).
 
-- Des de la 'Connexió 0' fem 'DELETE' a la taula 'punts' i eliminem per complert tots els valors d'aquesta.
+C1:
++ Esborra totes les tuples de la taula punts.
 
-- Des de la mateixa connexió, fem 'INSERT' a la taula 'punts' i introduïm dos valors nous.
+C2:
++ Com que a la connexió C1 encara no s'ha finalitzat la transacció:
 
-- Des de la 'Connexió 1' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió, fem 'DELETE' a la taula 'punts' i eliminem per complert tots els valors d'aquesta.
-
-- Des de la 'Connexió 2'fa un 'COUNT(*)' li surt un valor ja que des de la 'Connexió 1' no s'ha desat cap canvi.
-
+```
+ count 
+-------
+     1
+(1 row)
+```
 
 ## Exercici 8
 
@@ -744,84 +668,70 @@ realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint e
 compte que cada sentència s'executa en una connexió determinada.
 
 ```sql
+-- Se realizan los INSERTS
 INSERT INTO punts (id, valor)
 VALUES (80,5); -- Connexió 0
-
 INSERT INTO punts (id, valor)
 VALUES (81,9); -- Connexió 0
-
---Autocomit
-
---Bob realiza los DML. Inicia la transacción.
-
+-- Con1 inicia la transacción
 BEGIN; -- Connexió 1
-
 UPDATE punts 
    SET valor = 4
  WHERE id = 80; -- Connexió 1
-
---Autocomit
-
---Inicio de la transacción de Alice con los DML de update.
-
+-- Se modifica OK --> ID: 80 - Valor: 4.
 BEGIN; -- Connexió 2
 UPDATE punts 
    SET valor = 8
  WHERE id = 81; -- Connexió 2
-
-# Se quedará pillada la conexión de BOB. # DEADLOCK HACE UN ROLLBACK AUTOMÁTICO
-
+-- Se modifica OK --> ID: 81 - Valor: 8.
+-- id: 80 - valor: 5 y id: 81 - valor: 8
 UPDATE punts
    SET valor = 10
  WHERE id = 81; -- Connexió 1
-
--- BOB realiza otra conexión paralela a la BD e intenta hacer el UPDATE, tiene que hacer el COMMIT o ROLLBACK --> ALICE
-
--- Alice sigue con su UPDATE
-
+-- Se queda pillado aquí
 UPDATE punts
    SET valor = 6
  WHERE id = 80; -- Connexió 2
-
 COMMIT; -- Connexió 2
-
--- Alice hace el COMMIT; 
-
+-- Se genera un DEADLOCK y desbloquea la Con 1 que estaba pillada.
 COMMIT; -- Connexió 1
-
---Bob hace su 2do update y hace el COMIT.
- 
-
-
---Ahora si los cambios se verán reflejadas
-
 SELECT valor
   FROM punts
  WHERE id = 80; -- Connexió 0
-
---Hasta que no terminen de hacer COMMIT o ROLLBACK ninguno de los dos conexión 0 no podrá ver los cambios.
-
+ valor 
+-------
+     4
+(1 row)
 ```
 
-## Solución
-
-- Des de la 'Connexió 0' fem 'INSERT' dos cops sobre la taula 'punts' per inserir nous valors.
-
-- Des de la 'Connexió 1' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 4 quan es compleixi la condició.
-
-- Des de la 'Connexió 2' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 8 quan es compleixi la condició.
-
-- Des de la 'Connexió 1' fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 10 quan es compleixi la condició.
-
-- Tornem a la 'Connexió 2' i fem un 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 6 quan es compleixi la condició però es bloquejarà perquè aquest valor està sent utilitzat per la 'Connexió 1' --> (DEADLOCK), llavorns, farà un 'ROLLBACK' automàtic.
-
-- Tornem a la 'Connexió 1' i fem un 'COMMIT;'.
-
-- Tornem a la 'Connexió 0' i fem un 'SELECT;' sobre la taula 'punts' quan es compleixi la condició i ens retorna 4 com a valor.
+```
+      ┌────────────────────┬────────────────┬───────────────┬──────────────────────────────────────────────────────────────────┐
+      │     Conn 0         │       Conn 1   │     Conn 2    │   Comentaris                                                     │
+      ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (80,5) │                │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (81,9) │                │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Begin Trans.    │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Update(80,4)    │               │                                                                  │
+TEMPS ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Begin Trans.   │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(81,8)   │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Update(81,10)   │               │Es queda esperant a que la Conn 2 acabi, amb rollback o commit    │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(80,6)   │S'hauria d'esperar a que Conn 1 acabi però Conn 1 ja està esperant│
+  │   │                    │                │               │ a Conn 2 ->  DEADLOCK!                                           │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Commit         │No es fa el commit sinó rollback ja que hi ha hagut errors        │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  ▼   │                    │Commit          │               │Es fan els canvis d'aquesta transacció                            │
+      ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+      │SELECT -> 4         │                │               │                                                                  │
+      └────────────────────┴────────────────┴───────────────┴──────────────────────────────────────────────────────────────────┘
+```
 
 
 ## Exercici 9
@@ -833,39 +743,47 @@ compte que cada sentència s'executa en una connexió determinada.
 ```SQL
 INSERT INTO punts (id, valor)
 VALUES (90,5); -- Connexió 0
-
 BEGIN; -- Connexió 1
 DELETE FROM punts; -- Connexió 1
-
+-- Borra valor del primer INSERT OK
+-- Pero Con0 sigue viendo su valor.
 BEGIN; -- Connexió 2
 INSERT INTO punts (id, valor)
 VALUES (91,9); -- Connexió 2
+-- Con2 ve los datos de Con0 y su INSERT pero el DELETE de Con1 no sale todavía porque no ha hecho Commit o Rollback.
 COMMIT; -- Connexió 2
-
+-- Ok commit
 COMMIT; -- Connexió 1
-
+-- Su delete se hace efectivo
 SELECT valor
   FROM punts
  WHERE id = 91; -- Connexió 0
+  valor 
+-------
+     9
 ```
 
-## Solución
-
-- Des de la 'Connexió 0' fem un 'INSERT' sobre la taula 'punts' i introduïm els valors necesaris.
-
-- Des de la 'Connexió 1' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem un 'DELETE' i esborrem tot el contingut de la taula 'punts'.
-
-- Des de la 'Connexió 2' començem un altra transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem 'INSERT' i inserim dos valors nous.
-
-- Des de la mateixa connexió desem els canvis fent un 'COMMIT;'
-
-- Des de la 'Connexió 1' desem els canvis fent un 'COMMIT;'.
-
-- Des de la 'Connexió 0' fem un 'SELECT;' sobre la taula 'punts' quan es compleixi la condició i ens retorna 9 com a valor.
+```
+      ┌────────────────────┬────────────────┬───────────────┬──────────────────────────────────────────────────────────────────┐
+      │       Conn 0       │    Conn 1      │    Conn 2     │                        Comentaris                                │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (90,5) │                │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Begin Trans.    │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Delete          │               │A la transacció, s'esborra el que veu de la taula: el punt (90,5) │
+TEMPS ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Begin Trans.   │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Insert(91,9)   │S'afegeix aquest punt. Aquesta transacc. ara veu 2 punts          │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Commit         │Ara mateix es veuen els punts (90,5) i (91,9)                     │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Commit          │               │Es fa efectiva la transacció, esborrant el punt (90,5)            │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  ▼   │ SELECT -> 9        │                │               │                                                                  │
+      └────────────────────┴────────────────┴───────────────┴──────────────────────────────────────────────────────────────────┘
+```
 
 ## Exercici 10
 
@@ -876,132 +794,133 @@ compte que cada sentència s'executa en una connexió determinada.
 ```sql
 INSERT INTO punts (id, valor)
 VALUES (100,5); -- Connexió 0
-
---Autocomit
-
---Inicio de la transacción
-
+-- Insert OK
 BEGIN; -- Connexió 1
 UPDATE punts
    SET valor = 6
  WHERE id = 100; -- Connexió 1
-
-# Autocomit
-
-# Inicio de la transacción
-
+-- Inicia transacción, realiza el UPDATE OK
 BEGIN; -- Connexió 2
 UPDATE punts
    SET valor = 7
  WHERE id = 100; -- Connexió 2
+-- Se queda pillado aquí esperando que hace Conexión 1.
 COMMIT; -- Connexió 2
-
+-- Inicia transacción, pero se espera porque la Trasacción lo tiene Con1, realizará Update pero ve sólo el primer INSERT.
+-- sE GUARDA SU VALOR PRIMERO antes que Conexión1.
 COMMIT; -- Connexió 1
-
+-- Se guarda ahora y machaca el Update de Conexión2 y añade su valor.
 SELECT valor FROM punts
  WHERE id = 100; -- Connexió 0
+-- Muestra id:100 - valor=7
 ```
 
-## Solución
+```
+      ┌────────────────────┬────────────────┬───────────────┬──────────────────────────────────────────────────────────────────┐
+      │       Conn 0       │    Conn 1      │    Conn 2     │                        Comentaris                                │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (100,5)│                │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Begin Trans.    │               │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Update (100,6)  │               │                                                                  │
+TEMPS ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Begin Trans.   │                                                                  │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(100,7)  │Es queda esperant a veure què fa la Conn 1                        │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │                │Commit         │No s'executa fins que acaba la transacció de Conn 1               │
+  │   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+  │   │                    │Commit          │               │Modifica el punt (100,6) , però en fer el commit es desbloqueja   │
+  │   │                    │                │               │la Conn 2 i per tant es fa la modificació (100,7)                 │
+  ▼   ├────────────────────┼────────────────┼───────────────┼──────────────────────────────────────────────────────────────────┤
+      │ SELECT -> 7        │                │               │                                                                  │
+      └────────────────────┴────────────────┴───────────────┴──────────────────────────────────────────────────────────────────┘
+```
 
-- Des de la 'Connexió 0' fem 'INSERT' sobre la taula 'punts' i introduïm els valor necesaris.
 
-- Des de la 'Connexió 1' començem la transacció ('BEGIN;'). 
-
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 6 quan es compleixi la condició.
-
-- Des de la 'Connexió 2' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem 'update 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 7 quan es compleixi la condició, però es queda bloquejat ja que aquest valor s'està modificant en la 'Connexió 1'. F
-
-- Des de la mateixa connexió fem un 'COMMIT' però no s’executarà fins que la 'Connexió 1' acabi la transacció.
-
-- Des de la 'Connexió 1' fem un 'COMMIT' de la transacció.
-
-- Ara, des de la 'Connexió 0' fem un 'SELECT' de la taula 'punts' quan és compleixi la condició i ens retorna 7 degut a que després s’acabi la transacció de 'Connexió 1', s’executa la transacció de la 'Connexió 2'.
 
 ## Exercici 11
 
 Analitzant les següents sentències explica quins canvis es realitzen i on es realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint en compte que cada sentència s'executa en una connexió determinada.
 
-```SQL
+```sql
+-- Se realizan OK los inserts
 INSERT INTO punts (id, valor)
 VALUES (110,5); -- Connexió 0
 INSERT INTO punts (id, valor)
 VALUES (111,5); -- Connexió 0
-
---AUTOCOMIT
-
--- INICIO DE LA TRANSACCIÓN BOB
-
+-- Se inicia el la Transacción OK
 BEGIN; -- Connexió 1
 UPDATE punts
    SET valor = 6
  WHERE id = 110; -- Connexió 1
-
--- AUTOCOMMIT
-
--- SE REALIZA DML UPDATE
-
--- INICIO DE LA TRANSACCIÓN DE ALICE
-
+-- Se realiza el UPDATE OK
+-- Se realiza la Transacción OK
 BEGIN; -- Connexió 2
 UPDATE punts
    SET valor = 7
  WHERE id = 110; -- Connexió 2
-
-
+-- Se quedará pillado AQUÍ - BEGIN - Pero podemos seguir poniendo DML.
 UPDATE punts
    SET valor = 7
  WHERE id = 111; -- Connexió 2
-
-
 SAVEPOINT a; -- Connexió 2
+-- Se quedará pillado esperando PERO PODEMOS SEGUIR PONIENDO
 UPDATE punts
    SET valor = 8
  WHERE id = 110; -- Connexió 2
 ROLLBACK TO a; -- Connexió 2
 COMMIT; -- Connexió 2
-
--- Realiza operaciones y un savepoint y cierra con commit.
-
+-- Todavía en el pillado, esperando a CONNEXIÓN 1.
 COMMIT; -- Connexió 1
-
--- Vuelve a hacer otro commit.
-
+-- Se libera CONEXIÓN 2.
 SELECT valor 
   FROM punts 
  WHERE id = 111; -- Connexió 0
-
--- Muestra valores
-
+ 
+ -- Resultado
+ 
+  valor 
+-------
+     7
+(1 row)
+ 
 ```
 
-## Solución
+```
+      ┌────────────────────┬────────────────┬───────────────┬─────────────────────────────────────────────────────────────┐
+      │     Conn 0         │       Conn 1   │     Conn 2    │   Comentaris                                                │
+      ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (110,5)│                │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (111,5)│                │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Begin Trans.    │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Update(110,6)   │               │                                                             │
+TEMPS ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Begin Trans.   │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(110,7)  │Es queda bloquejat fins que Conn 1 acabi                     │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(111,7)  │"                                                            │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Savepoint a    │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(110,8)  │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Rollback to a  │Es desfa la modificació (110,8)                              │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Commit         │Encara espera                                                │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Commit          │               │Es fa el commit es modifica (110,6) i després (110,7),(111,7)│
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  ▼   │SELECT -> 7         │                │               │                                                             │
+      └────────────────────┴────────────────┴───────────────┴─────────────────────────────────────────────────────────────┘
+```
 
-- Des de la 'Connexió 0' fem 'INSERT' dos cops sobre la taula 'punts' per inserir nous valors.
 
-- Des de la 'Connexió 1' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 6 quan es compleixi la condició.
-
-- Des de la 'Connexió 2' començem la transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el  valor del camp 'valor' a 7 quan es compleixi la condició.
-
-- Des de la mateixa connexió fem 'UPDATE' i tornem a modificar la taula 'punts' i canviem el valor del camp 'valor' a 7 quan es compleixi la condició.
-
-- Des de la mateixa connexió creem un 'checkpoint' ('SAVEPOINT a;') però igualment, la transacció continua bloquejada per la anterior acció.
-
-- Des de la mateixa connexió fem 'UPDATE'  sobre la taula 'punts' i canviem el valor del camp 'valor' a 8 quan es compleixi la condició.
-
-- Des de la mateixa connexió fem 'ROLLBACK TO a;' i l'UPDATE fet anteriorment, no s'efectuarà.
-
-- Des de la mateixa connexió fem 'COMMIT'.
-
-- Des de la 'Connexió 1' fem 'COMMIT'.
-
-- Des de la 'Connexió 0' fem un 'SELECT' de la taula 'punts' quan és compleixi la condició i ens retorna 7 .
 
 ## Exercici 12
 
@@ -1010,13 +929,12 @@ realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint e
 compte que cada sentència s'executa en una connexió determinada.
 
 ```sql
+-- Insert 
 INSERT INTO punts (id, valor)
 VALUES (120,5); -- Connexió 0
 INSERT INTO punts (id, valor) 
 VALUES (121,5); -- Connexió 0
-
--- INSERT
-
+ -- Abre Transacción - Realiza el update OK de 121 a 6 - Crea Savepoint A - Realiza otro update a otro campo de 120. Pêndiente de COMMIT o ROLLBACK;
 BEGIN; -- Connexió 1
 UPDATE punts
    SET valor = 6
@@ -1025,67 +943,80 @@ SAVEPOINT a;
 UPDATE punts
    SET valor = 9
  WHERE id = 120; -- Connexió 1
-
--- AUTOCOMIT
-
+ 
+ -- Inicia Transacción - Realiza el UPDATE pero se queda esperando ya que hay un bloqueo de ROW por parte de Conexión 1
+ 
 BEGIN; -- Connexió 2
 UPDATE punts 
    SET valor = 7
  WHERE id = 120; -- Connexió 2
-
+-- Se queda colgado aquí, esperando a que Conexión 1 libere id = 120
 ROLLBACK TO a; -- Connexió 1
-
--- VUELVE A SAVEPOINT A
-
--- SE GENERA OTRO SAVEPOINT A
-
+-- Libera la espera de CONEXIÓN 2 ya que ha hecho un ROLLBACK a un savepoint a;
 SAVEPOINT a; -- Connexió 2
+-- Este sigue en la conexión
 UPDATE punts
    SET valor = 8
  WHERE id = 120; -- Connexió 2
+ 
+ -- Update OK ya que no hay nadie bloqueandola.
+ 
 ROLLBACK TO a; -- Connexió 2
+-- Se omite el UPDATE anterior ya que hicimos un ROLLBACK TO a;
 COMMIT; -- Connexió 2
-
--- SE GUARDA HASTA AQUÍ
-
 COMMIT; -- Connexió 1
-
--- SE REALIZA UN COMIT
-
 SELECT valor
   FROM punts
  WHERE id = 121; -- Connexió 0
-
--- MUESTRA 8
-
+ 
+ -- Solución:
+ 
+  valor 
+-------
+     6
+(1 row)
+ 
 ```
 
-## Solución
+```
+      ┌────────────────────┬────────────────┬───────────────┬─────────────────────────────────────────────────────────────┐
+      │     Conn 0         │       Conn 1   │     Conn 2    │   Comentaris                                                │
+      ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (120,5)│                │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │Afegeix punt (121,5)│                │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Begin Trans.    │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Update(121,6)   │               │                                                             │
+TEMPS ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Savepoint a     │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Update(120,9)   │               │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │2egin Trans.   │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(120,7)  │Es queda bloquejat fins que Conn 1 acabi                     │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Rollback to a   │               │Es desbloqueja el punt 120 de la Conn 2-> (120,7)            │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Savepoint a    │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Update(120,8)  │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Rollback to a  │                                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │                │Commit         │Es fa ja (120,7)                                             │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │                    │Commit          │               │Es fa (121,6)                                                │
+  │   ├────────────────────┼────────────────┼───────────────┼─────────────────────────────────────────────────────────────┤
+  │   │SELECT -> 6         │                │               │                                                             │
+  ▼   └────────────────────┴────────────────┴───────────────┴─────────────────────────────────────────────────────────────┘
+```
 
-- Des de la 'Connexió 0' fem 'INSERT' dos cops sobre la taula 'punts' per inserir nous valors.
+El punt 120 queda (120,7)
 
-- Des de la 'Connexió 1' començem una transacció ('BEGIN;').
 
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 6 quan es compleixi la condició.
 
-- Des de la mateixa connexió creem un 'checkpoint' ('SAVEPOINT a;).
 
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 9 quan es compleixi la condició.
 
-- Des de la 'Connexió 2' començem una transacció ('BEGIN;').
-
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 7 quan es compleixi la condició.
-
-- Des de la 'Connexió 1' fem 'ROLLBACK TO a' --> el que hem fet després del 'SAVEPOINT a' no es desarà.
-
-- Des de la 'Connexió 2' creem un 'checkpoint' --> 'SAVEPOINT a'.
-
-- Des de la mateixa connexió fem 'UPDATE' sobre la taula 'punts' i canviem el valor del camp 'valor' a 8 quan es compleixi la condició.
-
-- Des de la mateixa connexió fem un 'ROLLBACK TO a' fins al 'SAVEPOINT a;'.
-
-- Des de la mateixa connexió fem un 'COMMIT;'.
-
-- Des de la 'Connexió 1' fem un 'COMMIT;'.
-
-- Per últim, des de la 'Connexió 0' fem un 'SELECT' de la taula 'punts' quan és compleixi la condició i ens retorna 6.
