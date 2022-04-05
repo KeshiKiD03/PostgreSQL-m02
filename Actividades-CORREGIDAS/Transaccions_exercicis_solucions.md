@@ -368,7 +368,7 @@ VALUES (90,5); -- Connexió 0
 
 BEGIN; -- Connexió 1
 DELETE FROM punts; -- Connexió 1
--- Borra valor OK
+-- Borra valor del primer INSERT OK
 -- Pero Con0 sigue viendo su valor.
 
 BEGIN; -- Connexió 2
