@@ -276,36 +276,54 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint en
 compte que cada sentència s'executa en una connexió determinada.
 
-```
+```sql
+-- Se realizan los INSERTS
 INSERT INTO punts (id, valor)
 VALUES (80,5); -- Connexió 0
 INSERT INTO punts (id, valor)
 VALUES (81,9); -- Connexió 0
 
+
+-- Con1 inicia la transacción
 BEGIN; -- Connexió 1
 UPDATE punts 
    SET valor = 4
  WHERE id = 80; -- Connexió 1
+-- Se modifica OK --> ID: 80 - Valor: 4.
+
 
 BEGIN; -- Connexió 2
 UPDATE punts 
    SET valor = 8
  WHERE id = 81; -- Connexió 2
+-- Se modifica OK --> ID: 81 - Valor: 8.
+
+-- id: 80 - valor: 5 y id: 81 - valor: 8
 
 UPDATE punts
    SET valor = 10
  WHERE id = 81; -- Connexió 1
+
+-- Se queda pillado aquí
 
 UPDATE punts
    SET valor = 6
  WHERE id = 80; -- Connexió 2
 COMMIT; -- Connexió 2
 
+-- Se genera un DEADLOCK y desbloquea la Con 1 que estaba pillada.
+
 COMMIT; -- Connexió 1
 
 SELECT valor
   FROM punts
  WHERE id = 80; -- Connexió 0
+
+ valor 
+-------
+     4
+(1 row)
+
 ```
 
 ```
@@ -350,17 +368,30 @@ VALUES (90,5); -- Connexió 0
 
 BEGIN; -- Connexió 1
 DELETE FROM punts; -- Connexió 1
+-- Borra valor OK
+-- Pero Con0 sigue viendo su valor.
 
 BEGIN; -- Connexió 2
 INSERT INTO punts (id, valor)
 VALUES (91,9); -- Connexió 2
+-- Con2 ve los datos de Con0 y su INSERT pero el DELETE de Con1 no sale todavía porque no ha hecho Commit o Rollback.
+
 COMMIT; -- Connexió 2
 
+-- Ok commit
+
 COMMIT; -- Connexió 1
+
+-- Su delete se hace efectivo
 
 SELECT valor
   FROM punts
  WHERE id = 91; -- Connexió 0
+
+  valor 
+-------
+     9
+
 ```
 
 ```
@@ -391,25 +422,39 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint en
 compte que cada sentència s'executa en una connexió determinada.
 
-```
+```sql
 INSERT INTO punts (id, valor)
 VALUES (100,5); -- Connexió 0
+
+-- Insert OK
 
 BEGIN; -- Connexió 1
 UPDATE punts
    SET valor = 6
  WHERE id = 100; -- Connexió 1
 
+-- Inicia transacción, realiza el UPDATE OK
+
 BEGIN; -- Connexió 2
 UPDATE punts
    SET valor = 7
  WHERE id = 100; -- Connexió 2
+-- Se queda pillado aquí esperando que hace Conexión 1.
+
 COMMIT; -- Connexió 2
+
+-- Inicia transacción, pero se espera porque la Trasacción lo tiene Con1, realizará Update pero ve sólo el primer INSERT.
+
+-- sE GUARDA SU VALOR PRIMERO antes que Conexión1.
 
 COMMIT; -- Connexió 1
 
+-- Se guarda ahora y machaca el Update de Conexión2 y añade su valor.
+
 SELECT valor FROM punts
  WHERE id = 100; -- Connexió 0
+
+-- Muestra id:100 - valor=7
 ```
 
 ```
