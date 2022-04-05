@@ -532,6 +532,15 @@ COMMIT; -- Connexió 1
 SELECT valor 
   FROM punts 
  WHERE id = 111; -- Connexió 0
+ 
+ -- Resultado
+ 
+  valor 
+-------
+     7
+(1 row)
+
+ 
 ```
 
 ```
