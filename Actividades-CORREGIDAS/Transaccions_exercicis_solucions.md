@@ -486,32 +486,48 @@ TEMPS ├────────────────────┼──�
 
 Analitzant les següents sentències explica quins canvis es realitzen i on es realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint en compte que cada sentència s'executa en una connexió determinada.
 
-```
+```sql
+
+-- Se realizan OK los inserts
 INSERT INTO punts (id, valor)
 VALUES (110,5); -- Connexió 0
 INSERT INTO punts (id, valor)
 VALUES (111,5); -- Connexió 0
 
+-- Se inicia el la Transacción OK
 BEGIN; -- Connexió 1
 UPDATE punts
    SET valor = 6
  WHERE id = 110; -- Connexió 1
 
+-- Se realiza el UPDATE OK
+
+-- Se realiza la Transacción OK
+
 BEGIN; -- Connexió 2
 UPDATE punts
    SET valor = 7
  WHERE id = 110; -- Connexió 2
+
+-- Se quedará pillado AQUÍ - BEGIN - Pero podemos seguir poniendo DML.
+
 UPDATE punts
    SET valor = 7
  WHERE id = 111; -- Connexió 2
 SAVEPOINT a; -- Connexió 2
+-- Se quedará pillado esperando PERO PODEMOS SEGUIR PONIENDO
 UPDATE punts
    SET valor = 8
  WHERE id = 110; -- Connexió 2
 ROLLBACK TO a; -- Connexió 2
+
 COMMIT; -- Connexió 2
 
+-- Todavía en el pillado, esperando a CONNEXIÓN 1.
+
 COMMIT; -- Connexió 1
+
+-- Se libera CONEXIÓN 2.
 
 SELECT valor 
   FROM punts 
