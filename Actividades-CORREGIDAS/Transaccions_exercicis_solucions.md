@@ -20,13 +20,22 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
 ```SQL
+
+-- 1
+
 INSERT INTO punts (id, valor)
 VALUES (10, 5);
+
+-- 2 
+
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 10;
 ROLLBACK;
+
+-- 3
+
 SELECT valor
   FROM punts
  WHERE id = 10;
@@ -37,6 +46,8 @@ SELECT valor
 + Afegeix la tupla (10, 5).
 
 + La modificació no es fa perquè hi ha un `ROLLBACK`.
+
+KESHI: El --2 no se actualiza. Se inserta --1 y muestra --3.
 
 
 ```
@@ -51,13 +62,19 @@ SELECT valor
 Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
-```
+```sql
+-- 1
+
 INSERT INTO punts (id, valor)
 VALUES (20,5);
+
+-- 2
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 20;
+
+-- 3 
 COMMIT;
 SELECT valor
   FROM punts
@@ -69,6 +86,7 @@ SELECT valor
 
 + Modifica la tupla (20,5) -> (20,4), es fa el COMMIT
 
+KESHI: El --1 se inserta, el --2 se modifica el valor y se guarda. Muestra el SELECT con nuevo Valor.
 
 ```
  valor
@@ -82,17 +100,24 @@ SELECT valor
 Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
-```
+```sql
+-- 1 Insert OK
 INSERT INTO punts (id, valor)
 VALUES (30,5);
+
+-- 2 Inicio BEGIN
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 30;
 SAVEPOINT a;
+
+-- 3 
 INSERT INTO punts (id, valor)
 VALUES (31,7);
-ROLLBACK;
+ROLLBACK; -- Vuelve al INICIO, especificar
+
+-- 4
 SELECT valor
   FROM punts
  WHERE id = 30;
@@ -119,18 +144,27 @@ que s'ha fet entre el BEGIN i el ROLLBACK.
 Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
-```
+```sql
+-- 1 Delete OK S'esborren tots els registres de la taula.
 DELETE FROM punts;
+
+
 INSERT INTO punts (id, valor)
 VALUES (40,5);
+
+-- 2 S'insereix la tupla (40, 5).
 BEGIN;
 UPDATE punts 
    SET valor = 4
  WHERE id = 40;
 SAVEPOINT a;
+
+-- 3
 INSERT INTO punts (id, valor)
 VALUES (41,7);
-ROLLBACK TO a;
+ROLLBACK TO a; -- S'insereix una nova tupla, però es cancel·larà aquesta acció perquè fem un `ROLLBACK TO`tornant just al punt anterior a aquesta acció.
+
+-- 4
 SELECT COUNT(*)
   FROM punts;
 ```
@@ -166,16 +200,22 @@ que hi havia després del BEGIN.
 Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
-```
+```sql
+-- 1
 INSERT INTO punts (id, valor)
 VALUES (50,5);
+
+-- 2 + La transacció no s'executa perquè hi ha una consulta amb un error.
 BEGIN;
 SELECT id, valor
  WHERE punts;
+
 UPDATE punts
    SET valor = 4
  WHERE id = 50;
 COMMIT;
+
+-- 3
 SELECT valor
   FROM punts
  WHERE id = 50;
@@ -198,22 +238,32 @@ valor
 Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT.
 
-```
+```sql
+
+-- 1
 DELETE FROM punts;
+
 INSERT INTO punts (id, valor)
 VALUES (60,5);
+
+-- 2
 BEGIN;
 UPDATE punts
    SET valor = 4
  WHERE id = 60;
 SAVEPOINT a;
+
+-- 3
 INSERT INTO punts (id, valor)
 VALUES (61,8);
 SAVEPOINT b;
-INSERT punts (id, valor)
+
+INSERT INTO punts (id, valor)
 VALUES (62,9);
 ROLLBACK TO b;
 COMMIT;
+
+-- 4
 SELECT SUM(valor)
   FROM punts;
 ```
@@ -241,13 +291,15 @@ Analitzant les següents sentències explica quins canvis es realitzen i on es
 realitzen. Finalment digues quin valor s'obtindrà amb l'últim SELECT. Tenint en
 compte que cada sentència s'executa en una connexió determinada.
 
-```
+```sql
 DELETE FROM punts; -- Connexió 0
 INSERT INTO punts (id, valor)
 VALUES (70,5); -- Connexió 0
 
 BEGIN; -- Connexió 1
 DELETE FROM punts; -- Connexió 1
+
+-- Se queda pillado aquí
 
 SELECT COUNT(*) 
   FROM punts; -- Connexió 2
