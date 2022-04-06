@@ -2,14 +2,6 @@
 # Examen M02 Transacciones - DCL - Backup - Acceso y bloqueos
 # 06.04.22
 
-docker pull keshikid03/mykeshipostgres:latest
-
-docker network create 2hisx
-
-docker run --rm --name postgres0 -h postgres0 --net 2hisx -it keshikid03/mykeshipostgres:latest /bin/bash
-
-service postgresql start
-
 html - GT
 
 [INDEX:](file:///usr/share/doc/postgresql-doc-13/html/index.html)
