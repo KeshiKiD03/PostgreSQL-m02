@@ -16,7 +16,7 @@ html - GT
 
 [CLIENT AUTHENTICATION - PG_HBA CONF:](file:///usr/share/doc/postgresql-doc-13/html/auth-pg-hba-conf.html) *
 
-[BACKUP:](file:///usr/share/doc/postgresql-doc-13/html/backup.html) *
+[BACKUP:](file:///usr/share/doc/postgresql-doc-13/html/backup-dump.html) *
 
 # 1
 
